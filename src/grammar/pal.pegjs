@@ -3,7 +3,7 @@
  */
 
 program
- = __ program_head declarations period { /* no return */ }
+  = __ program_head declarations period { /* no return */ }
 
 program_head
   = program_keyword identifier program_files smcln
@@ -25,25 +25,24 @@ declarations
     compound_stat
 
 const_decls
-  = "const"
+  = const
 
 type_decls
-  = "type"
+  = type
 
 var_decls
-  = "var"
+  = var var_list smcln
 
 sub_decls
-  = "function"
-  / "procedure"
+  = function
+  / procedure
 
 
 /*
- * Useful rules
+ * Common rules
  */
 compound_stat
   = begin statements end
-
 
 statements
   = statement smcln statements
@@ -52,13 +51,39 @@ statements
 
 statement
   = sub_invocation
-  /
+  / compound_stat
+  / assignment
+  / conditional
+  / while_loop
+  / 
+
+
+conditional
+  = if expression then statement else statement
+  / if expression then statement
+
+while_loop
+  = while expression do statement
+
+assignment
+  = assignable assign expression
+
+assignable
+  = identifier
+/*
+  / array_access
+  / record_access
+*/
+
+expression
+  = identifier
 
 sub_invocation
   = identifier params
 
 params
   = lparen param_list rparen
+  / lparen __ rparen
 
 param_list
   = param comma param_list
@@ -67,8 +92,34 @@ param_list
 param
   = expression
 
-expression
+array_access
+  = assignable array_index
+
+array_index
+  = lbrack expression_list rbrack
+
+expression_list
+  = expression comma expression_list
+  / expression
+
+record_access
+  = identifier period identifier
+
+
+/*
+ * Elaboration of declaration list.
+ */
+
+var_list
+  = var_declaration smcln var_list
+  / var_declaration
+
+var_declaration
+  = identifier colon any_type
+
+any_type
   = identifier
+
 
 /*
  * Generic Terminals
@@ -76,24 +127,35 @@ expression
 period = "." __
 lparen = "(" __
 rparen = ")" __
+lbrack = "[" __
+rbrack = "]" __
 comma  = "," __
-smcln    = ";" __
+colon  = ":" __
+smcln  = ";" __
+assign = ":=" __
+
 
 /*
  * Keywords
  */
-
-program_keyword
-  = "program" token_sep
-
-begin = "begin" token_sep
-end   = "end" __
-if    = "if" __
-
- 
+program_keyword = "program" token_sep
+begin     = "begin" __
+end       = "end" __
+const     = "const" __
+type      = "type" __
+var       = "var" __ 
+procedure = "procedure" __
+function  = "function" __
+if        = "if" __
+then      = "then" __
+else      = "else" __
+while     = "while" __
+do        = "do" __
+div       = "div" __
+mod       = "mod" __
 
 /*
- * Terminals!
+ * Even more terminals!
  */
 
 identifier "identifier"
@@ -101,6 +163,12 @@ identifier "identifier"
 
 idtext
   = [A-Za-z][A-ZA-z0-9]*
+
+integer
+  = [0-9]+
+
+real
+  = integer "." integer
 
 
 
@@ -116,10 +184,8 @@ token_sep
 comment "comment"
   = multiline_comment
 
-
 multiline_comment "comment"
   = "{" ( !"}" . )* "}"
-
 
 whitespace "whitespace"
   = [ \t]
