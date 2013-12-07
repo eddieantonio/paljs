@@ -1,3 +1,6 @@
 name: Pal.JS
+
+baseurl: '/paljs'
+
 markdown: kramdown
 pygments: true
