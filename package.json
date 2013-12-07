@@ -1,0 +1,15 @@
+{
+  "name": "paljs",
+  "private": "yes",
+  "version": "0.0.1",
+  "description": "JavaScript Pal compiler",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "Eddie Antonio Santos <easantos@ualberta.ca>",
+  "license": "BSD",
+  "devDependencies": {
+    "grunt": "~0.4.2"
+  }
+}
