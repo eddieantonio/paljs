@@ -25,8 +25,6 @@
 
 }
 
-program = __ e:expression { return e;}
-/*
 program
   = __ head:program_head decls:declarations period {
       return {
@@ -37,7 +35,6 @@ program
         declarations: decls
       }
     }
-*/
 
 
 
@@ -156,14 +153,32 @@ statement
 
 
 conditional
-  = if expression then statement else statement
-  / if expression then statement
+  = if cond:expression then
+    cons:statement
+    alt:(else s:statement {return s;})? {
+      return {
+        ast: 'if',
+        loc: [line, column],
+
+        condition: cond,
+        consequent: cons,
+        alternative: alt || []
+      };
+    }
 
 while_loop
   = while expression do statement
 
 assignment
-  = variable assign expression
+  = left:variable assign right:expression {
+      return {
+        ast: 'assign',
+        loc: [line, column],
+
+        left: left,
+        right: right
+      }
+    }
 
 
 /*
@@ -301,7 +316,6 @@ variable
        loc: [line, column],
 
        name: name,
-       right: right
      };
   }
 
@@ -442,7 +456,7 @@ real "real"
 
 digits "digits"
   = chars:[0-9]+ {
-      return chars.join(''); 
+      return chars.join('');
     }
 
 
