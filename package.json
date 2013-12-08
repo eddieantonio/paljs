@@ -2,7 +2,7 @@
   "name": "paljs",
   "version": "0.0.1",
   "description": "JavaScript Pal compiler",
-  "private": "yes",
+  "private": true,
   "author": {
     "name": "Eddie Antonio Santos",
     "email": "easantos@ualberta.ca"
