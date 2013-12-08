@@ -5,17 +5,11 @@ AST =
 
   head:
     ast: 'program head'
-    name:
-      ast: 'identifier'
-      val: 'factorial'
+    name: 'factorial'
     files:
       ast: 'files'
-      input:
-        ast: 'identifier'
-        val: 'input'
-      output:
-        ast: 'identifier'
-        val: 'output'
+      input: 'input'
+      output: 'output'
 
   declarations:
     ast: 'declarations'
@@ -24,19 +18,18 @@ AST =
     subroutines: [
 
       ast: 'function'
-      name:
-        ast: 'identifier'
-        val: 'factorial'
+      name: 'factorial'
       params: [
         ast: 'formal parameter'
         reference: no
-        name:
-          ast: 'identifier'
-          val: 'n'
+        name: 'n'
+        type:
+          ast: 'named type'
+          name: 'integer'
       ]
       rettype:
-        ast: 'identifier'
-        val: 'integer'
+        ast: 'named type'
+        name: 'integer'
 
       declarations:
         ast: 'declarations'
@@ -48,15 +41,15 @@ AST =
           condition:
             ast: '<='
             left:
-              ast: 'identifier'
-              val: 'n'
+              ast: 'scalar'
+              name: 'n'
             right:
               ast: 'integer'
               val: 1
           consequent: [
             ast: 'assignment'
             left:
-              ast: 'identifier'
+              ast: 'scalar'
               val: 'fatorial'
             right:
               ast: 'integer'
@@ -65,22 +58,22 @@ AST =
           alternative: [
             ast: 'assignment'
             left:
-              ast: 'identifier'
+              ast: 'scalar'
               val: 'fatorial'
             right:
               ast: '*'
               left:
-                ast: 'identifier'
+                ast: 'scalar'
                 val: 'n'
               right:
                 ast: 'subroutine call'
                 name:
-                  ast: 'identifier'
+                  ast: 'scalar'
                   val: 'fatorial'
                 args: [
                   ast: '-'
                   left:
-                    ast: 'identifier'
+                    ast: 'scalar'
                     val: 'n'
                   right:
                     ast: 'integer'
@@ -93,14 +86,10 @@ AST =
 
     body: [
       ast: 'subroutine call'
-      name:
-        ast: 'identifier'
-        val: 'writeln'
+      name: 'writeln'
       args: [
         ast: 'subroutine call'
-        name:
-          ast: 'identifier'
-          val: 'factorial'
+        name: 'factorial'
         args: [
           ast: 'integer'
           val: 6

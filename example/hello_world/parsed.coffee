@@ -5,17 +5,11 @@ AST =
 
   head:
     ast: 'program head'
-    name:
-      ast: 'identifier'
-      val: 'hello'
+    name: 'hello'
     files:
       ast: 'files'
-      input:
-        ast: 'identifier'
-        val: 'input'
-      output:
-        ast: 'identifier'
-        val: 'output'
+      input: 'input'
+      output: 'output'
 
   declarations:
     ast: 'declarations'
@@ -27,9 +21,7 @@ AST =
       ast: 'statements'
       nodes: [
         ast: 'subroutine call'
-        name:
-          ast: 'identifier'
-          val: 'writeln'
+        name: 'writeln'
         nodes: [
           ast: 'string'
           val: 'Hello, World!'
