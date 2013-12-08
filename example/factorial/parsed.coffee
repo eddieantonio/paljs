@@ -4,7 +4,7 @@ AST =
   ast: 'program'
 
   head:
-    ast: 'program head'
+    ast: 'program_head'
     name: 'factorial'
     files:
       ast: 'files'
@@ -20,7 +20,7 @@ AST =
       ast: 'function'
       name: 'factorial'
       params: [
-        ast: 'formal parameter'
+        ast: 'formal_parameter'
         reference: no
         name: 'n'
         type:
@@ -28,7 +28,7 @@ AST =
           name: 'integer'
       ]
       rettype:
-        ast: 'named type'
+        ast: 'named_type'
         name: 'integer'
 
       declarations:

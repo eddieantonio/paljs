@@ -4,7 +4,7 @@ AST =
   ast: 'program'
 
   head:
-    ast: 'program head'
+    ast: 'program_head'
     name: 'hello'
     files:
       ast: 'files'
@@ -13,16 +13,16 @@ AST =
 
   declarations:
     ast: 'declarations'
-    constants: null
-    types: null
-    subroutines: null
+    constants: []
+    types: []
+    subroutines: []
 
     body:
       ast: 'statements'
       nodes: [
-        ast: 'subroutine call'
+        ast: 'sub_invocation'
         name: 'writeln'
-        nodes: [
+        params: [
           ast: 'string'
           val: 'Hello, World!'
         ]
