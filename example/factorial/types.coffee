@@ -5,17 +5,11 @@ AST =
 
   head:
     ast: 'program head'
-    name:
-      ast: 'identifier'
-      val: 'factorial'
+    name: 'factorial'
     files:
       ast: 'files'
-      input:
-        ast: 'identifier'
-        val: 'input'
-      output:
-        ast: 'identifier'
-        val: 'output'
+      input: 'input'
+      output: 'output'
 
   declarations:
     ast: 'declarations'
@@ -24,19 +18,18 @@ AST =
     subroutines: [
 
       ast: 'function'
-      name:
-        ast: 'identifier'
-        val: 'factorial'
+      name: 'factorial'
       params: [
         ast: 'formal parameter'
         reference: no
-        name:
-          ast: 'identifier'
-          val: 'n'
+        name: 'n'
+        type:
+          ast: 'named type'
+          name: 'integer'
       ]
       rettype:
-        ast: 'identifier'
-        val: 'integer'
+        ast: 'named type'
+        name: 'integer'
 
       declarations:
         ast: 'declarations'
@@ -47,44 +40,56 @@ AST =
           ast: 'if'
           condition:
             ast: '<='
+            type: 'boolean'
             left:
-              ast: 'identifier'
-              val: 'n'
+              ast: 'scalar'
+              name: 'n'
+              type: 'integer'
             right:
               ast: 'integer'
               val: 1
+              type: 'integer'
           consequent: [
             ast: 'assignment'
             left:
-              ast: 'identifier'
+              ast: 'scalar'
               val: 'fatorial'
+              type: 'integer'
             right:
               ast: 'integer'
               val: 1
+              type: 'integer'
           ]
           alternative: [
             ast: 'assignment'
             left:
-              ast: 'identifier'
+              ast: 'scalar'
               val: 'fatorial'
+              type: 'integer'
             right:
               ast: '*'
+              type: 'integer'
               left:
-                ast: 'identifier'
+                ast: 'scalar'
                 val: 'n'
+                type: 'integer'
               right:
                 ast: 'subroutine call'
+                type: 'integer'
                 name:
-                  ast: 'identifier'
+                  ast: 'scalar'
                   val: 'fatorial'
+                  type: 'integer'
                 args: [
                   ast: '-'
                   left:
-                    ast: 'identifier'
+                    ast: 'scalar'
                     val: 'n'
+                    type: 'integer'
                   right:
                     ast: 'integer'
                     val: 1
+                    type: 'integer'
                 ]
           ]
         ]
@@ -93,18 +98,18 @@ AST =
 
     body: [
       ast: 'subroutine call'
-      name:
-        ast: 'identifier'
-        val: 'writeln'
+      name: 'writeln'
+      type: 'integer'
       args: [
         ast: 'subroutine call'
-        name:
-          ast: 'identifier'
-          val: 'factorial'
+        type: 'integer'
+        name: 'factorial'
         args: [
           ast: 'integer'
           val: 6
+          type: 'integer'
         ]
       ]
     ]
 
+module.exports = AST
