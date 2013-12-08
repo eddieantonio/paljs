@@ -3,17 +3,26 @@
  */
 
 {
+  function makeRightExpression(expressions) {
+    var currentExpression = expressions.shift();
 
-  /* Collapses binary and unary expressions. */
-  function collapseExpression(exprs, right) {
-    if (exprs.length) {
-        exprs[0].right = right;
-        return exprs;
-    } else {
-        return right;
+    if (!expressions.length) {
+      return currentExpression;
     }
 
+    currentExpression.right = makeRightExpression(expressions);
+
+    return currentExpression;
+
   }
+
+  /* Collapses binary and unary expressions. */
+  function collapseExpression(expressions, final) {
+    expressions.push(final);
+
+    return makeRightExpression(expressions);
+  }
+
 }
 
 program = __ e:expression { return e;}
@@ -281,29 +290,43 @@ unsigned_const
 
 
 /*
- * Variables and assignables!
+ * Variables.
+ * This is broken.
  */
 
 variable
-  = identifier variable_rest
+  = name:identifier right:variable_rest* {
+     return {
+       ast: 'variable',
+       loc: [line, column],
+
+       name: name,
+       right: right
+     };
+  }
 
 variable_rest
-  = period variable
-  / array_index+
-  /
+  = record_access
+  / array_access
 
 array_access
-  = variable array_index
-
-array_index
-  = lbrack expression_list rbrack
+  = lbrack list:expression_list rbrack {
+      return list;
+    }
 
 expression_list
-  = expression comma expression_list
-  / expression
+  = head:expression rest:(comma e:expression { return e; })* {
+      return [head].concat(rest);
+    }
 
 record_access
-  = variable period identifier
+  = period name:identifier {
+      return {
+        ast: 'record_access',
+        loc: [line, column],
+        field: name
+      };
+    }
 
 
 
@@ -392,7 +415,7 @@ identifier "identifier"
   = text:id_text __ { return text; }
 
 id_text
-  = text:([A-Za-z][A-ZA-z0-9]*) {
+  = text:([A-Za-z][A-Za-z0-9]*) {
       return text[0] + text[1].join('');
     }
 
