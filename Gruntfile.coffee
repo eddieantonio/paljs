@@ -14,6 +14,5 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-peg'
 
   # Default: Build the project.
-  grunt.registerTask 'default', '', ->
-    grunt.log.write('Grunting not implemented. ').ok()
+  grunt.registerTask 'default', ['peg']
 

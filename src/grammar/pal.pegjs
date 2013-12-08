@@ -4,20 +4,38 @@
 
 program
   = __ head:program_head decls:declarations period {
-      return new ast.Program([line, column], head, decls);
+      return {
+        ast: 'program',
+        loc: [line, column],
+
+        head: head,
+        declarations: decls
+      }
     }
 
 
 program_head
   = program_keyword name:identifier files:program_files smcln {
-    return new ast.ProgramHead([line, column], name, files);
+    return {
+      ast: 'program_head',
+      loc: [line, column],
+
+      name: name,
+      files: files
+    }
   }
 
 /* The "files" that the program uses.  A bizarre, non-functional leftover from
  * Pascal. The identifiers MUST be 'input' and 'output', respectively. */
 program_files
-  =  lparen input:identifier comma output:identifier rparen {
-      return new ast.Node([line, column], program_files, input, output);
+  = lparen input:identifier comma output:identifier rparen {
+    return {
+      ast: 'program_files',
+      loc: [line, column],
+
+      input: input,
+      output: output
+    }
   }
 
 
@@ -25,12 +43,21 @@ program_files
  * Declarations!
  */
 declarations
-  = c:const_decls?
-    t:type_decls?
-    v:var_decls?
-    p:sub_decls?
+  = constants:const_decls?
+    types:type_decls?
+    vars:var_decls?
+    subroutines:sub_decls?
     body: compound_stat {
-      return new ast.DeclarationBlock([line, column], c, t, v, p, body);
+      return {
+        ast: 'declarations',
+        loc: [line, column],
+
+        constants: constants,
+        types: types,
+        vars: vars,
+        subroutines: subroutines,
+        body: body
+      }
     }
 
 const_decls
@@ -57,13 +84,10 @@ compound_stat
 
 statements
   = stmt:statement smcln rest:statements {
-    return stmt.concat(rest);
   }
   / statement {
-    return [stmt];
   }
   / {
-    return [];
   }
 
 statement
@@ -244,7 +268,7 @@ identifier "identifier"
   = text:idtext __ { return text; }
 
 idtext
-  = [A-Za-z][A-ZA-z0-9]*
+  = text:([A-Za-z][A-ZA-z0-9]*) { return text[0] + text[1].join('') }
 
 integer
   = [0-9]+
