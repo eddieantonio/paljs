@@ -3,7 +3,24 @@ layout: default
 title: pal.js
 ---
 
+<script src="js/pal.min.js"></script>
+<!--script src="js/pal-ui.js"></script-->
+
 <div id="home">
-  <h1>Pal.JS</h1>
-  <p> Maybe a thing I'll get around to doing. </p>
+  <p> A <strong>broken</strong> Pal to JavaScript compiler! </p>
+
+  <div class='panel-container clearfix'>
+    <div class='left panel'>
+      <h2> Type stuff here: </h2>
+      <textarea class="code-input" id='pal-program'>program hello(input, output);
+begin
+   writeln('hello')
+end.</textarea>
+    </div>
+    <div class='right panel'>
+      <h2> Maybe see <del class="whoopsies">JavaScript</del> JSON here! </h2>
+      <div id='pal-output'></div>
+    </div>
+  </div>
+
 </div>

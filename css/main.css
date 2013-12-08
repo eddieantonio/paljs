@@ -14,13 +14,13 @@ html, body { height: 100%; }
 
 body {
   background-color: #FFF;
-  font: 13.34px Helvetica, Arial, sans-serif;
-  font-size: small;
-  text-align: center;
+  color: #000;
+  font: 14px Helvetica, Arial, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-size: 100%; }
+  font-size: 100%;
+}
 
 h1 { margin-bottom: 1em; }
 p { margin: 1em 0; }
@@ -29,25 +29,35 @@ a         { color: #00a; }
 a:hover   { color: #000; }
 a:visited { color: #a0a; }
 
-/*****************************************************************************/
-/*
-/* Home
-/*
-/*****************************************************************************/
-ul.posts {
-  list-style-type: none;
-  margin-bottom: 2em;
+/*****************************************************************************
+ * Home
+ ****************************************************************************/
+
+.site-header {
+  max-width: 960px;
+  padding-top: 40px;
+  margin: auto;
 }
 
-ul.posts li {
-  line-height: 1.75em;
+.site-header .title {
+  display: inline;
+  font-size: 400%;
 }
 
-ul.posts span {
-  color: #aaa;
-  font-family: Monaco, "Courier New", monospace;
-  font-size: 80%;
+.site-header a { text-decoration: none; }
+.site-header a:link { color: #333; }
+.site-header a:hover { color: #666; }
+
+.header-nav { display: inline; }
+.header-nav ul {
+  margin-left: 0;
+  list-style: none;
+  display: inline;
 }
+.header-nav ul > li {
+  display: inline-block;
+}
+
 
 /*****************************************************************************/
 /*
@@ -58,7 +68,7 @@ ul.posts span {
 .site {
   font-size: 115%;
   text-align: justify;
-  width: 42em;
+  width: 960px;
   margin: 3em auto 2em;
   line-height: 1.5em;
 }
@@ -121,40 +131,47 @@ ul.posts span {
   border: 0;
 }
 
-/*****************************************************************************/
 /*
-/* Posts
-/*
-/*****************************************************************************/
+ * Main input thing.
+ */
+.panel {
+  width: 470px;
+  min-height: 120px;
+}
+.panel textarea {
+  min-width: 100%;
+  min-height: 256px;
+}
+.panel.left {
+  float: left;
+  margin-right: 10px;
+}
+.panel.right {
+  float: right;
+  margin-left: 10px;
 
-/* standard */
-.post pre {
-  border: 1px solid #ddd;
-  background-color: #eef;
-  padding: 0 .4em;
+}
+.code-input {
+  font-family: "Droid Sans Mono", "Consolas", "Monaco",  monospace;
+  font-size: 115%;
 }
 
-.post ul, .post ol {
-  margin-left: 1.35em;
+del.whoopsies {
+  color: #900;
 }
 
-.post code {
-  border: 1px solid #ddd;
-  background-color: #eef;
-  padding: 0 .2em;
+
+/* Clearfix from: http://www.webtoolkit.info/css-clearfix.html#.UqT6CmTuInU */
+.clearfix:after {
+  content: ".";
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
 }
 
-.post pre code {
-  border: none;
+.clearfix {
+  display: inline-block;
 }
 
-/* terminal */
-.post pre.terminal {
-  border: 1px solid #000;
-  background-color: #333;
-  color: #FFF;
-}
-
-.post pre.terminal code {
-  background-color: #333;
-}
