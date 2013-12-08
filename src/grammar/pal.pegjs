@@ -78,16 +78,11 @@ sub_decls
  * Common rules
  */
 compound_stat
-  = begin list:statements end {
-    return list;
-  }
+  = begin list:statements end { return list; }
 
 statements
-  = stmt:statement smcln rest:statements {
-  }
-  / statement {
-  }
-  / {
+  = stmt:statement rest:(smcln s:statement { return s })* {
+    return [stmt].concat(rest)
   }
 
 statement
@@ -152,7 +147,16 @@ factor
 
 
 sub_invocation
-  = identifier params
+  = name:identifier params:params {
+      return {
+        ast: 'sub_invocation',
+        loc: [line, column],
+
+        name: name,
+        params: params
+      }
+    }
+
 
 params
   = lparen param_list rparen
@@ -277,7 +281,25 @@ real
   = integer "." integer
 
 string
-  = "'" "'"
+  = "'" text:(string_char*) "'" __ {
+      return text.join('');
+    }
+
+
+string_char
+  = normal_string_char
+  / string_escape
+
+normal_string_char
+  = !("'" / eol / "\\") char:. { return char; }
+
+string_escape
+  = "\\" char:escaped_char { return char; }
+
+escaped_char
+  = "n"  { return "\n"; }
+  / "'"  { return "'"; }
+  / "\\" { return "\\"; }
 
 
 
