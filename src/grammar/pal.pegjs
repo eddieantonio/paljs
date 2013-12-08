@@ -2,6 +2,20 @@
  * PEG.JS grammar for Pal
  */
 
+{
+
+  /* Collapses binary and unary expressions. */
+  function collapseExpression(exprs, right) {
+    if (exprs.length) {
+        exprs[0].right = right;
+        return exprs;
+    } else {
+        return right;
+    }
+
+  }
+}
+
 program = __ e:expression { return e;}
 /*
 program
@@ -148,51 +162,89 @@ assignment
  */
 
 expression
-  = comparative_expression* simple_expr
+  = exprs:comparative_expression* right:simple_expr {
+      return collapseExpression(exprs, right);
+    }
 
 comparative_expression
-  = simple_expr comparison_op
+  = left:simple_expr op:comparison_op {
+      return {
+        ast: 'binary_' + op,
+        loc: [line, column],
+
+        left: left
+      };
+    }
 
 comparison_op
-  = equal
-  / nequal
-  / lequal
-  / gequal
-  / less
-  / great
+  = equal  { return 'equal';  }
+  / nequal { return 'nequal'; }
+  / lequal { return 'lequal'; }
+  / gequal { return 'gequal'; }
+  / less   { return 'less';   }
+  / great  { return 'great';  }
 
 simple_expr
-  = additive_expression* term
+  = exprs:additive_expression* right:term {
+      return collapseExpression(exprs, right);
+    }
 
 additive_expression
-  = term_prefix
-  / term additive_op
+  = op:term_prefix {
+      return {
+         ast: 'unary_' + op,
+         loc: [line, column]
+      };
+    }
+  / left:term op:additive_op {
+      return {
+        ast: 'binary_' + op,
+        loc: [line, column],
+
+        left: left
+      }
+    }
 
 term_prefix
- = plus
- / sub
+ = plus   { return 'pos' }
+ / sub    { return 'neg' }
 
 additive_op
-  = or
-  / plus
-  / sub
+  = or    { return 'or'; }
+  / plus  { return 'plus'; }
+  / sub   { return 'sub'; }
 
 term
-  = multiplicative_expression* factor
+  = exprs:multiplicative_expression* right:factor {
+      return collapseExpression(exprs, right);
+  }
 
 multiplicative_expression
-  = factor multiplicative_op
+  = left:factor op:multiplicative_op {
+    return {
+      ast: 'binary_' + op,
+      loc: [line, column],
+
+      left: left
+    }
+  }
 
 multiplicative_op
-  = mult
-  / rdiv
-  / div
-  / mod
-  / and
+  = mult { return 'mult' }
+  / rdiv { return 'rdiv' }
+  / div  { return 'idiv' }
+  / mod  { return 'mod'; }
+  / and  { return 'and'; }
 
 
 factor
-  = not factor
+  = not right:factor {
+      return {
+        ast: 'unary_not',
+        loc: [line, column],
+        right: right
+      };
+    }
   / sub_invocation
   / variable
   / lparen expression rparen
@@ -265,6 +317,8 @@ var_list
 
 var_declaration
   = identifier colon any_type
+
+
 
 /*
  * Type declarations
