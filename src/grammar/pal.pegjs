@@ -3,26 +3,35 @@
  */
 
 program
-  = __ program_head declarations period { }
+  = __ head:program_head decls:declarations period {
+      return new ast.Program([line, column], head, decls);
+    }
+
 
 program_head
-  = program_keyword identifier program_files smcln
+  = program_keyword name:identifier files:program_files smcln {
+    return new ast.ProgramHead([line, column], name, files);
+  }
 
 /* The "files" that the program uses.  A bizarre, non-functional leftover from
  * Pascal. The identifiers MUST be 'input' and 'output', respectively. */
 program_files
-  =  lparen identifier comma identifier rparen
+  =  lparen input:identifier comma output:identifier rparen {
+      return new ast.Node([line, column], program_files, input, output);
+  }
 
 
 /*
  * Declarations!
  */
 declarations
-  = const_decls?
-    type_decls?
-    var_decls?
-    sub_decls?
-    compound_stat
+  = c:const_decls?
+    t:type_decls?
+    v:var_decls?
+    p:sub_decls?
+    body: compound_stat {
+      return new ast.DeclarationBlock([line, column], c, t, v, p, body);
+    }
 
 const_decls
   = const
@@ -42,12 +51,20 @@ sub_decls
  * Common rules
  */
 compound_stat
-  = begin statements end
+  = begin list:statements end {
+    return list;
+  }
 
 statements
-  = statement smcln statements
-  / statement
-  /
+  = stmt:statement smcln rest:statements {
+    return stmt.concat(rest);
+  }
+  / statement {
+    return [stmt];
+  }
+  / {
+    return [];
+  }
 
 statement
   = sub_invocation
