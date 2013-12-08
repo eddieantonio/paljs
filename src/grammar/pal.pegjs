@@ -2,7 +2,7 @@
  * PEG.JS grammar for Pal
  */
 
-program = expression
+program = __ e:expression { return e;}
 /*
 program
   = __ head:program_head decls:declarations period {
@@ -223,8 +223,8 @@ param
   = expression
 
 unsigned_const
-  = integer
-  / real
+  = real
+  / integer
   / string
 
 
@@ -344,13 +344,29 @@ id_text
 
 
 integer
-  = digits __
+  = d:digits __ {
+      return {
+        ast: 'integer',
+        loc: [line, column],
 
-digits "digits"
-  = [0-9]+
+        val: parseInt(d, 10)
+      }
+    }
 
 real "real"
-  = digits "." digits __
+  = d:digits "." f:digits __ {
+      return {
+        ast: 'real',
+        loc: [line, column],
+
+        val: parseFloat(d + '.' + f, 10)
+      }
+    }
+
+digits "digits"
+  = chars:[0-9]+ {
+      return chars.join(''); 
+    }
 
 
 string
