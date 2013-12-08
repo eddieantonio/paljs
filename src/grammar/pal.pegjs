@@ -2,6 +2,8 @@
  * PEG.JS grammar for Pal
  */
 
+program = expression
+/*
 program
   = __ head:program_head decls:declarations period {
       return {
@@ -12,7 +14,13 @@ program
         declarations: decls
       }
     }
+*/
 
+
+
+/*
+ * Program stuff.
+ */
 
 program_head
   = program_keyword name:identifier files:program_files smcln {
@@ -70,10 +78,12 @@ var_decls
   = var var_list smcln
 
 sub_decls
-  = list:(subroutine*)
+  = list:(subroutine+) {
+      return list;
+    }
 
 subroutine
-  = sub:( function_decl / procedure_decl ) smcln decls:declarations {
+  = sub:( function_decl / procedure_decl ) smcln decls:declarations smcln {
     sub.declarations = decls;
     return sub;
   }
@@ -114,11 +124,11 @@ statements
     }
 
 statement
-  = sub_invocation
-  / compound_stat
-  / assignment
-  / conditional
+  = conditional
   / while_loop
+  / compound_stat
+  / sub_invocation
+  / assignment
   /
 
 
@@ -133,46 +143,60 @@ assignment
   = variable assign expression
 
 
+/*
+ * Expressions
+ */
+
 expression
-  = simple_expr
-  / comparative_expr
+  = comparative_expression* simple_expr
 
-comparative_expr
-  = term comparative_expr_rest
+comparative_expression
+  = simple_expr comparison_op
 
-comparative_expr_rest
-  = equal  simple_expr
-  / nequal simple_expr
+comparison_op
+  = equal
+  / nequal
+  / lequal
+  / gequal
+  / less
+  / great
 
 simple_expr
-  = term
-  / term simple_expr_rest
-  / plus simple_expr_rest
-  / sub  simple_expr_rest
+  = additive_expression* term
 
+additive_expression
+  = term_prefix
+  / term additive_op
 
-simple_expr_rest
-  = plus term
-  / sub  term
-  / or   term
+term_prefix
+ = plus
+ / sub
+
+additive_op
+  = or
+  / plus
+  / sub
 
 term
-  = factor term_rest
-  / factor 
+  = multiplicative_expression* factor
 
-term_rest
-  = mult term
-  / rdiv term
-  / div  term
-  / mod  term
-  / and  term
+multiplicative_expression
+  = factor multiplicative_op
+
+multiplicative_op
+  = mult
+  / rdiv
+  / div
+  / mod
+  / and
+
 
 factor
-  = sub_invocation
+  = not factor
+  / sub_invocation
   / variable
-  / unsigned_const
   / lparen expression rparen
-  / not factor
+  / unsigned_const
 
 
 sub_invocation
@@ -185,7 +209,6 @@ sub_invocation
         params: params
       }
     }
-
 
 params
   = lparen list:param_list rparen { return list; }
@@ -271,6 +294,10 @@ rbrack = "]" __
 comma  = "," __
 colon  = ":" __
 smcln  = ";" __
+plus   = "+" __
+sub    = "-" __
+mult   = "*" __
+rdiv   = "/" __
 equal  = "=" __
 great  = ">" __
 less   = "<" __
@@ -279,14 +306,6 @@ lequal = "<=" __
 gequal = ">=" __
 assign = ":=" __
 range  = ".." __
-plus   = "+" __
-sub    = "-" __
-or     = "or" __
-and    = "and" __
-not    = "not" __
-mult   = "*"
-rdiv   = "/"
-
 
 /*
  * Keywords
@@ -306,6 +325,9 @@ while     = "while" __
 do        = "do" __
 div       = "div" __
 mod       = "mod" __
+or        = "or" __
+and       = "and" __
+not       = "not" __
 
 
 /*
@@ -320,14 +342,19 @@ id_text
       return text[0] + text[1].join('');
     }
 
+
 integer
+  = digits __
+
+digits "digits"
   = [0-9]+
 
-real
-  = integer "." integer
+real "real"
+  = digits "." digits __
+
 
 string
-  = "'" text:(string_char*) "'" __ {
+  = "'" text:(string_char*) "'" {
       return {
          ast: 'string',
          loc: [line, column],
