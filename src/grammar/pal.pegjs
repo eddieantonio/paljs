@@ -66,10 +66,8 @@ while_loop
   = while expression do statement
 
 assignment
-  = assignable assign expression
+  = variable assign expression
 
-assignable
-  = identifier
 
 expression
   = simple_expr
@@ -105,7 +103,12 @@ term_rest
   /
 
 factor
-  = identifier
+  = variable
+  / unsigned_const
+  / lparen expression rparen
+  / sub_invocation
+  / not factor
+
 
 sub_invocation
   = identifier params
@@ -121,8 +124,21 @@ param_list
 param
   = expression
 
+unsigned_const
+  = integer
+  / real
+  / string
+
+variable
+  = identifier variable_rest
+
+variable_rest
+  = period variable
+  / array_index+
+  /
+
 array_access
-  = assignable array_index
+  = variable array_index
 
 array_index
   = lbrack expression_list rbrack
@@ -132,7 +148,7 @@ expression_list
   / expression
 
 record_access
-  = identifier period identifier
+  = variable period identifier
 
 
 /*
@@ -173,6 +189,7 @@ plus   = "+" __
 sub    = "-" __
 or     = "or" __
 and    = "and" __
+not    = "not" __
 mult   = "*"
 rdiv   = "/"
 
@@ -211,6 +228,9 @@ integer
 
 real
   = integer "." integer
+
+string
+  = "'" "'"
 
 
 
