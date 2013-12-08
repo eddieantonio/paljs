@@ -3,7 +3,7 @@
  */
 
 program
-  = __ program_head declarations period { /* no return */ }
+  = __ program_head declarations period { }
 
 program_head
   = program_keyword identifier program_files smcln
@@ -70,12 +70,41 @@ assignment
 
 assignable
   = identifier
-/*
-  / array_access
-  / record_access
-*/
 
 expression
+  = simple_expr
+  / comparative_expr
+
+comparative_expr
+  = term comparative_expr_rest
+
+comparative_expr_rest
+  = equal  simple_expr
+  / nequal simple_expr
+
+simple_expr
+  = term simple_expr_rest
+  / plus simple_expr_rest
+  / sub  simple_expr_rest
+ 
+simple_expr_rest
+  = plus term
+  / sub  term
+  / or   term
+  /
+
+term
+  = factor term_rest
+
+term_rest
+  = mult term
+  / rdiv term
+  / div  term
+  / mod  term
+  / and  term
+  /
+
+factor
   = identifier
 
 sub_invocation
@@ -132,7 +161,20 @@ rbrack = "]" __
 comma  = "," __
 colon  = ":" __
 smcln  = ";" __
+equal  = "=" __
+great  = ">" __
+less   = "<" __
+nequal = "<>" __
+lequal = "<=" __
+gequal = ">=" __
 assign = ":=" __
+range  = ".." __
+plus   = "+" __
+sub    = "-" __
+or     = "or" __
+and    = "and" __
+mult   = "*"
+rdiv   = "/"
 
 
 /*
@@ -192,3 +234,7 @@ whitespace "whitespace"
 
 eol "end of line"
   = "\n"
+
+
+empty
+  =
