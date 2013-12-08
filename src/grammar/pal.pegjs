@@ -52,10 +52,10 @@ declarations
         ast: 'declarations',
         loc: [line, column],
 
-        constants: constants,
-        types: types,
-        vars: vars,
-        subroutines: subroutines,
+        constants: constants || [],
+        types: types || [],
+        vars: vars || [],
+        subroutines: subroutines || [],
         body: body
       }
     }
@@ -70,9 +70,37 @@ var_decls
   = var var_list smcln
 
 sub_decls
-  = function
-  / procedure
+  = list:(subroutine*)
 
+subroutine
+  = sub:( function_decl / procedure_decl ) smcln decls:declarations {
+    sub.declarations = decls;
+    return sub;
+  }
+
+
+function_decl
+  = function name:identifier params:formal_param_list colon type:simple_type {
+      return {
+        ast: 'function',
+        loc: [line, column],
+
+        name: name,
+        params: params,
+        rtype: type
+      };
+    }
+
+procedure_decl
+  = procedure name:identifier params:formal_param_list {
+      return {
+        ast: 'procedure',
+        loc: [line, column],
+
+        name: name,
+        params: params,
+      };
+    }
 
 /*
  * Common rules
@@ -81,9 +109,9 @@ compound_stat
   = begin list:statements end { return list; }
 
 statements
-  = stmt:statement rest:(smcln s:statement { return s })* {
-    return [stmt].concat(rest)
-  }
+  = stmt:statement rest:(smcln s:statement { return s; })* {
+      return [stmt].concat(rest);
+    }
 
 statement
   = sub_invocation
@@ -91,7 +119,7 @@ statement
   / assignment
   / conditional
   / while_loop
-  / 
+  /
 
 
 conditional
@@ -117,18 +145,20 @@ comparative_expr_rest
   / nequal simple_expr
 
 simple_expr
-  = term simple_expr_rest
+  = term
+  / term simple_expr_rest
   / plus simple_expr_rest
   / sub  simple_expr_rest
- 
+
+
 simple_expr_rest
   = plus term
   / sub  term
   / or   term
-  /
 
 term
   = factor term_rest
+  / factor 
 
 term_rest
   = mult term
@@ -136,7 +166,6 @@ term_rest
   / div  term
   / mod  term
   / and  term
-  /
 
 factor
   = sub_invocation
@@ -159,12 +188,13 @@ sub_invocation
 
 
 params
-  = lparen param_list rparen
-  / lparen __ rparen
+  = lparen list:param_list rparen { return list; }
 
 param_list
-  = param comma param_list
-  / param
+  = head:param rest:(comma p:param { return p; })* {
+      return [head].concat(rest);
+    }
+  / { return []; }
 
 param
   = expression
@@ -213,8 +243,21 @@ var_list
 var_declaration
   = identifier colon any_type
 
+/*
+ * Type declarations
+ */
 any_type
-  = identifier
+  = simple_type
+
+simple_type
+  = name:identifier {
+      return {
+        ast: 'named_type',
+        loc: [line, column],
+
+        name: name
+      };
+    }
 
 
 /*
@@ -253,7 +296,7 @@ begin     = "begin" __
 end       = "end" __
 const     = "const" __
 type      = "type" __
-var       = "var" __ 
+var       = "var" __
 procedure = "procedure" __
 function  = "function" __
 if        = "if" __
@@ -264,15 +307,18 @@ do        = "do" __
 div       = "div" __
 mod       = "mod" __
 
+
 /*
  * Even more terminals!
  */
 
 identifier "identifier"
-  = text:idtext __ { return text; }
+  = text:id_text __ { return text; }
 
-idtext
-  = text:([A-Za-z][A-ZA-z0-9]*) { return text[0] + text[1].join('') }
+id_text
+  = text:([A-Za-z][A-ZA-z0-9]*) {
+      return text[0] + text[1].join('');
+    }
 
 integer
   = [0-9]+
@@ -282,7 +328,12 @@ real
 
 string
   = "'" text:(string_char*) "'" __ {
-      return text.join('');
+      return {
+         ast: 'string',
+         loc: [line, column],
+
+         text: text.join('')
+      }
     }
 
 
@@ -300,6 +351,28 @@ escaped_char
   = "n"  { return "\n"; }
   / "'"  { return "'"; }
   / "\\" { return "\\"; }
+
+
+/*
+ * Formal parameter lists.
+ */
+formal_param_list
+  = "(" list:formal_params? ")" { return list || []; }
+
+formal_params
+  = head:formal_param rest:(smcln p:formal_param { return p; })* {
+      return [head].concat(rest);
+    }
+
+formal_param
+  = v:var? name:identifier colon simple_type {
+      return {
+        ast: 'formal_parameter',
+        loc: [line, column],
+
+        reference: !!v, /* If 'var' is present, this is true. */
+      };
+    }
 
 
 
