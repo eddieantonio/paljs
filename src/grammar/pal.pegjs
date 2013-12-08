@@ -103,10 +103,10 @@ term_rest
   /
 
 factor
-  = variable
+  = sub_invocation
+  / variable
   / unsigned_const
   / lparen expression rparen
-  / sub_invocation
   / not factor
 
 
@@ -129,6 +129,11 @@ unsigned_const
   / real
   / string
 
+
+/*
+ * Variables and assignables!
+ */
+
 variable
   = identifier variable_rest
 
@@ -149,6 +154,7 @@ expression_list
 
 record_access
   = variable period identifier
+
 
 
 /*
