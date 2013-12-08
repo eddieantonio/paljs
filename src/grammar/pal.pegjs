@@ -332,7 +332,7 @@ string
          ast: 'string',
          loc: [line, column],
 
-         text: text.join('')
+         val: text.join('')
       }
     }
 
