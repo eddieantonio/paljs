@@ -3,6 +3,7 @@
  */
 
 {
+
   function makeRightExpression(expressions) {
     var currentExpression = expressions.shift();
 
@@ -491,7 +492,7 @@ escaped_char
  * Formal parameter lists.
  */
 formal_param_list
-  = "(" list:formal_params? ")" { return list || []; }
+  = lparen list:formal_params? rparen { return list || []; }
 
 formal_params
   = head:formal_param rest:(smcln p:formal_param { return p; })* {
@@ -531,6 +532,3 @@ whitespace "whitespace"
 eol "end of line"
   = "\n"
 
-
-empty
-  =
