@@ -32,9 +32,11 @@ module.exports = (grunt) ->
     uglify:
       options:
         banner: "/*!<%= copyright %>*/\n"
-      dist:
+      paljs:
         files:
           'js/pal.min.js':      ['<%= concat.paljs.dest %>']
+      ui:
+        files:
           'js/pal-ui.min.js':   ['<%= coffee.ui.dest %>']
 
   # Tasks to load:
@@ -46,6 +48,8 @@ module.exports = (grunt) ->
 
   # Builds the client-side compiler thing.
   grunt.registerTask 'build', ['peg', 'coffee', 'concat']
+  # Builds the UI files and ugifilies.
+  grunt.registerTask 'ui', ['coffee:ui', 'uglify:ui']
 
   # Prepares the products of the build for distribution.
   grunt.registerTask 'dist', ['build', 'uglify']
