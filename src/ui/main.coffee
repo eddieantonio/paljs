@@ -35,7 +35,6 @@ makeOutputter = ($el) -> (err, output) ->
     else
       # This is what people use templates for, but... :/
       $('<pre>')
-        .addClass('code output')
         .text(output)
 
   $el.html $output

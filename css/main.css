@@ -151,9 +151,21 @@ a:visited { color: #a0a; }
   margin-left: 10px;
 
 }
-.code-input {
+.code {
   font-family: "Droid Sans Mono", "Consolas", "Monaco",  monospace;
   font-size: 115%;
+}
+
+.code.output {
+  /* Make it smaller, because... really. */
+  font-size: 75%;
+  color: #111;
+  background-color: #f9f9f9;
+}
+
+.do-not-be-ridiculous {
+  max-height: 320px;
+  overflow: scroll;
 }
 
 del.whoopsies {
