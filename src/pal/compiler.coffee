@@ -4,10 +4,15 @@ PalCompiler = (input, options={}) ->
   PalCompiler.parse(input)
 
 PalCompiler.parse = (input) ->
+  result =
+    output: null
+    error: null
   try
-    PalParser.parse input, 'program'
+    result.output = PalParser.parse input, 'program'
   catch e
-    { error: e }
+    result.error = e
+
+  result
 
 # Installs as a global in a browser or sets this as the main export in Node.
 install = (obj, name) ->

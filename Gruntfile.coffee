@@ -9,21 +9,24 @@ module.exports = (grunt) ->
         join: yes
       paljs:
         dest: 'build/pal.js'
-        src: ['src/**/*.coffee']
+        src: ['src/pal/**/*.coffee']
+      ui:
+        dest: 'build/pal-ui.js'
+        src: ['src/ui/**/*.coffee']
 
     peg:
       options:
         trackLineAndColumn: yes
-        exportVar: 'palParser'
-      pal:
+        exportVar: 'PalParser'
+      paljs:
         src: 'src/grammar/pal.pegjs',
         dest: 'build/pal.tab.js'
 
     concat:
       options:
         seperator: ';'
-      dist:
-        src:  ['build/pal.tab.js', 'build/lib.js']
+      paljs:
+        src:  ['<%= peg.paljs.dest %>', '<%= coffee.paljs.dest %>']
         dest: 'js/pal.js'
 
     uglify:
@@ -31,7 +34,8 @@ module.exports = (grunt) ->
         banner: "/*!<%= copyright %>*/\n"
       dist:
         files:
-          'js/pal.min.js': ['<%= concat.dist.dest %>']
+          'js/pal.min.js':      ['<%= concat.paljs.dest %>']
+          'js/pal-ui.min.js':   ['<%= coffee.ui.dest %>']
 
   # Tasks to load:
   grunt.loadNpmTasks 'grunt-peg'
@@ -41,11 +45,11 @@ module.exports = (grunt) ->
 
 
   # Builds the client-side compiler thing.
-  grunt.registerTask 'build', ['peg', 'coffee']
+  grunt.registerTask 'build', ['peg', 'coffee', 'concat']
 
   # Prepares the products of the build for distribution.
-  grunt.registerTask 'dist', ['build', 'concat:dist', 'uglify:dist']
+  grunt.registerTask 'dist', ['build', 'uglify']
 
   # Default: Build the project.
-  grunt.registerTask 'default', ['build']
+  grunt.registerTask 'default', ['dist']
 
