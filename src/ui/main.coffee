@@ -53,12 +53,8 @@ $ ->
   delayedCompile =
     _.debounce (-> compile(inputFetcher, outputter)), 300
 
-  # Trigger the change event when a key is let go.
-  $input.on 'keyup', ->
-    $(@).trigger 'change'
-
   # Compile the input on change.
-  $input.on 'change', ->
+  $input.on 'keyup copy cut paste change', ->
     delayedCompile()
 
   # Compile the input for the first time.
