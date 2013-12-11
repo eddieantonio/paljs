@@ -4,6 +4,7 @@
 
 {
 
+  /* Recursivly collapses binary nodes with left-to-right associtavity. */
   function makeRightExpression(expressions) {
     var currentExpression = expressions.shift();
 
@@ -90,18 +91,16 @@ declarations
     }
 
 const_decls
-  = const
+  = const list:const_decl+ { return list; }
 
 type_decls
-  = type
+  = type list:type_decl+ { return list; }
 
 var_decls
-  = var var_list smcln
+  = var list:var_decl+ { return list; }
 
 sub_decls
-  = list:(subroutine+) {
-      return list;
-    }
+  = list:subroutine+ { return list; }
 
 subroutine
   = sub:( function_decl / procedure_decl ) smcln decls:declarations smcln {
@@ -132,6 +131,42 @@ procedure_decl
         params: params,
       };
     }
+
+/* Simple declarations: */
+const_decl
+  = name:identifier equal expr:expression smcln {
+      return {
+        ast: 'constant_declaration',
+        loc: [line, column],
+
+        name: name,
+        expr: expr
+      };
+    }
+
+type_decl
+  = name:identifier equal type:type_expr smcln {
+      return {
+        ast: 'type_declaration',
+        loc: [line, column],
+
+        name: name,
+        type: type
+      };
+    }
+
+/* TODO: this is wrong, actually... */
+var_decl
+  = name:identifier colon type:type_expr smcln  {
+      return {
+        ast: 'variable_declaration',
+        loc: [line, column],
+
+        name: name,
+        type: type
+      };
+    }
+
 
 /*
  * Common rules
@@ -168,7 +203,16 @@ conditional
     }
 
 while_loop
-  = while expression do statement
+  = while cond:expression do body:statement {
+      return {
+        ast: 'while',
+        loc: [line, column],
+
+        condition: cond,
+        body: body,
+      };
+
+  }
 
 assignment
   = left:variable assign right:expression {
@@ -346,22 +390,9 @@ record_access
 
 
 /*
- * Elaboration of declaration list.
- */
-
-var_list
-  = var_declaration smcln var_list
-  / var_declaration
-
-var_declaration
-  = identifier colon any_type
-
-
-
-/*
  * Type declarations
  */
-any_type
+type_expr
   = simple_type
 
 simple_type
