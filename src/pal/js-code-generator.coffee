@@ -23,7 +23,28 @@ class JSCodeGenerator
   @makeBinOp: (binop) -> (node) ->
     ['(', @visit(node.left), binop, @visit(node.right), ')']
 
-  # Here's the big array of ast nodes and the actions that should be called
+  # Given a function of (body, node), givens an action that compiles the
+  # subroutine. It calls the given function which should return a 'filtered'
+  # body.
+  @makeWrappedSubroutine: (func) -> (node) ->
+    # TODO: Get the names of the parameters...
+    params = []
+
+    { name } = node
+    header = "function #{name}(#{params.join(', ')}) {\n"
+
+    # Visit the body of the subroutine, calling the given wrapper function
+    # (in this context).
+    body =
+      @indentThis =>
+        func.call(@, @visit(node.declarations, '$body'), node)
+
+    [@indent, header, body, @indent, '}\n']
+
+
+
+
+  # Here's the big array of AST nodes and the actions that should be called
   # when they are visited. Each each action should return either a list or a
   # string of JavaScript code.
   @actions =
@@ -43,21 +64,17 @@ class JSCodeGenerator
 
     # Pseudo-node kind. Should be fed a declaration node. This is the body
     # of any function, subroutine, etc.
+    # Assumes indent is set at the correct level.
     $body: (node) ->
       # TODO: visit the var declarations.
       vars = []
 
-      # Need to expliclty defined these in this scope.
-      body = undefined
-      subroutines = undefined
+      # Compile all of the subroutines.
+      subroutines =
+        @visit sub for sub in node.subroutines
 
-      @indentThis =>
-        # Compile all of the subroutines.
-        subroutines =
-          @visit sub for sub in node.subroutines
-
-        # Compile every statment that makes up the body
-        body = @visit node.body, '$stmt'
+      # Compile every statment that makes up the body
+      body = @visit node.body, '$stmt'
 
       # ...and concatenate all of the above categories.
       [].concat(vars, subroutines, body)
@@ -71,57 +88,37 @@ class JSCodeGenerator
       else
         ''
 
-    procedure: (node) ->
-      # Get the names of the parameters...
-      # TODO:
-      params = []
+    procedure: (node) -> @makeWrappedSubroutine (body) -> body
+
+    'function': @makeWrappedSubroutine (body, node) ->
+      retName = '$$' + node.name
 
       [
         @indent
-        "function #{name}(#{parms.join(', ')}) {"
-
-        # Visit this node as a generic "body" node.
-        @visit node, '$body'
-
+        "var #{retName};\n"
+        body
+        # The return always goes at the bottom.
         @indent
-        "}"
-      ]
+        "return #{retName};\n"
+      ].join('')
 
-    'function': (node) ->
-      # Get the names of the parameters...
-      # TODO:
-      # TODO: Also, refactor this to share code with 'procedure'.
-      params = []
 
-      [
-        @indent
-        "function #{name}(#{params.join(', ')}) {"
-        "#{@indent}  var _ret;"
-
-        # Visit this node as a generic "body" node.
-        @visit node, '$body'
-
-        # Put the return
-        "#{@indent}  return _ret;"
-        @indent
-        "}"
-      ]
 
     'if': (node) ->
       condition =
         ['if (', @visit(node.condition), ') {\n']
 
       # Compile the list of statements
-      body = undefined
-      @indentThis =>
-        body = @visit node.consequent, '$stmt'
+      body =
+        @indentThis =>
+          body = @visit node.consequent, '$stmt'
 
       elsePart =
         if node.alternative?
           topElse = [@indent, '} else {\n']
-          elseBody = undefined
-          @indentThis =>
-            elseBody = @visit node.alternative, '$stmt'
+          elseBody =
+            @indentThis =>
+              @visit node.alternative, '$stmt'
           topElse.concat(elseBody)
         else
           []
@@ -135,9 +132,9 @@ class JSCodeGenerator
         ['while (', @visit(node.condition), ') {\n']
 
       # Compile the list of statements
-      body = undefined
-      @indentThis =>
-        body = @visit node.body, '$stmt'
+      body =
+        @indentThis =>
+          @visit node.body, '$stmt'
 
       condition.concat [body, @indent, '}']
 
@@ -225,12 +222,15 @@ class JSCodeGenerator
       console.warn 'No action for', node
       ''
 
-  # Executes the function, but must indent all its output.
+  # Executes the function, incrementing the indent while it's running. When
+  # the function returns, the original identation is restored.
+  # Returns the result of the given function.
   indentThis: (func) ->
       # Increment the indent.
       oldIdent = @indent
       @indent += @indentAmount
-      func()
+      result = func()
       @indent = oldIdent
+      result
 
 
