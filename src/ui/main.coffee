@@ -14,7 +14,10 @@ compile = (fetchInput, outputter) ->
 
   # Run the actual dang compiler on it:
   {output, error} = PalCompiler.parse programText
-  if output
+
+  # Output as a JSONified string if whatever I feel like outputting at this
+  # time is NOT a string.
+  if output and not output instanceof String
     output = JSON.stringify(output, null, 2)
 
   # Dig. Output it.
@@ -35,7 +38,7 @@ makeOutputter = ($el) -> (err, output) ->
     else
       # This is what people use templates for, but... :/
       $('<pre>')
-        .text(output)
+        .html(output)
 
   $el.html $output
 
