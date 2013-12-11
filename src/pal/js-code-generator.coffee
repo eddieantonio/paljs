@@ -33,8 +33,8 @@ class JSCodeGenerator
   # subroutine. It calls the given function which should return a 'filtered'
   # body.
   @makeWrappedSubroutine: (func) -> (node) ->
-    # TODO: Get the names of the parameters...
-    params = []
+    params =
+      @variableNameFor(paramNode.name) for paramNode in node.params
 
     name = @subroutineNameFor node.name
     header = "function #{name}(#{params.join(', ')}) {\n"

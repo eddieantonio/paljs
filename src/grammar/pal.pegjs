@@ -537,11 +537,13 @@ formal_params
     }
 
 formal_param
-  = v:var? name:identifier colon simple_type {
+  = v:var? name:identifier colon type:simple_type {
       return {
         ast: 'formal_parameter',
         loc: [line, column],
 
+        name: name,
+        type: type,
         reference: !!v, /* If 'var' is present, this is true. */
       };
     }
