@@ -150,7 +150,7 @@ statement
   / compound_stat
   / sub_invocation
   / assignment
-  /
+  / { return; } /* Return NOTHING. */
 
 
 conditional
@@ -514,7 +514,7 @@ formal_param
 /*
  * Non program text characters
  */
-__ = token_sep *
+__ = token_sep * { return; } /* No need to return anything at all. */
 
 token_sep
   = ( comment / whitespace / eol )

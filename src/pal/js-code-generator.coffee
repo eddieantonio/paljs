@@ -46,9 +46,11 @@ class JSCodeGenerator
         @visit sub for sub in node.subroutines
       @ident = oldIdent
 
-      # Compile the body...
+      # Compile every statment that makes up the body...
       body =
-        "#{@ident}#{@visit stmt};\n" for stmt in node.body
+        # Some statements are undefined... skip those.
+        for stmt in node.body when stmt?
+          @ident + @visit(stmt) + ';\n'
 
       # ...and concatenate all of the above categories.
       [].concat(vars, subroutines, body)
@@ -117,6 +119,7 @@ class JSCodeGenerator
   # action or the 'explicitAction', if given. The return should be a string.
   # Probably.
   visit: (node, explicitAction=null) ->
+
     # Use either the explictly given action or the AST node kind.
     kind = explicitAction or node.ast
     { actions } = JSCodeGenerator
