@@ -421,13 +421,19 @@ or        = "or" __
 and       = "and" __
 not       = "not" __
 
+/* Great big list of keywords. These cannot be matched by an identifier. */
+keyword =
+  "begin" / "end" /
+  "const" / "type" / "var" / "procedure" / "function" /
+  "if" / "then" / "else" / "while" / "do" /
+  "div" / "mod" / "or" / "and" / "not"
 
 /*
  * Even more terminals!
  */
 
 identifier "identifier"
-  = text:id_text __ { return text; }
+  = !keyword text:id_text __ { return text; }
 
 id_text
   = text:([A-Za-z][A-Za-z0-9]*) {
@@ -462,7 +468,7 @@ digits "digits"
 
 
 string
-  = "'" text:(string_char*) "'" {
+  = "'" text:(string_char*) "'" __ {
       return {
          ast: 'string',
          loc: [line, column],
