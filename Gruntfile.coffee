@@ -40,9 +40,12 @@ module.exports = (grunt) ->
           'js/pal-ui.min.js':   ['<%= coffee.ui.dest %>']
 
     watch:
-      paljs:
+      src:
         files: ["<%= coffee.paljs.src %>"]
-        tasks: ['paljs']
+        tasks: ['pal-src']
+      grammar:
+        files: ["<%= peg.paljs.src %>"]
+        tasks: ['pal-grammar']
       ui:
         files: ["<%= coffee.ui.src %>"]
         tasks: ['ui']
@@ -58,14 +61,17 @@ module.exports = (grunt) ->
 
 
   # Builds the client-side compiler thing.
-  grunt.registerTask 'paljs', ['peg',
-    'coffee:paljs', 'concat:paljs', 'uglify:paljs']
+  grunt.registerTask 'pal-concat', ['concat:paljs']
+  grunt.registerTask 'pal-src', ['coffee:paljs', 'pal-concat']
+  grunt.registerTask 'pal-grammar', ['peg', 'pal-concat']
+  grunt.registerTask 'paljs', ['peg', 'pal-src']
+
   # Builds the UI files and ugifilies.
-  grunt.registerTask 'ui', ['coffee:ui', 'uglify:ui']
+  grunt.registerTask 'ui', ['coffee:ui']
   # Builds EVERYTHING.
   grunt.registerTask 'build', ['paljs', 'ui']
   # Prepares the products of the build for distribution.
-  grunt.registerTask 'dist', ['build']
+  grunt.registerTask 'dist', ['build', 'uglify']
 
   # Default: Build the project.
   grunt.registerTask 'default', ['dist']
