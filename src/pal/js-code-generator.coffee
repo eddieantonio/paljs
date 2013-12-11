@@ -176,9 +176,9 @@ class JSCodeGenerator
     # Got to place strings in quotes and escape characters.
     string: (node) ->
       original = node.val
-      # Replace \, ', " with its backslash escape and add quotes around it.
-      # And voila, a JavaScript string literal!
-      "'#{original.replace /[\\'"]/, '//$&'}'"
+      # Replace \, ', and \n with their respective backslash escape and add
+      # quotes around it. And voila, a JavaScript string literal!
+      "'#{original.replace(/[\\']/, '\\$&').replace(/\n/, '\\n')}'"
 
     # For integers and reals, do nothing more than explicitly convert these to
     # strings.
