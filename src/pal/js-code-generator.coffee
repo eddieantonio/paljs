@@ -88,7 +88,7 @@ class JSCodeGenerator
       else
         ''
 
-    procedure: (node) -> @makeWrappedSubroutine (body) -> body
+    procedure: @makeWrappedSubroutine (body) -> body
 
     'function': @makeWrappedSubroutine (body, node) ->
       retName = '$$' + node.name
@@ -174,7 +174,7 @@ class JSCodeGenerator
     binary_sub:    @makeBinOp '-'
     binary_or:     @makeBinOp '||'
 
-    binary_mul:    @makeBinOp '*'
+    binary_mult:   @makeBinOp '*'
     binary_rdiv:   @makeBinOp '/'
     binary_mod:    @makeBinOp '%'
     binary_and:    @makeBinOp '&&'
