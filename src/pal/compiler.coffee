@@ -8,9 +8,13 @@ PalCompiler.parse = (input) ->
     output: null
     error: null
   try
-    result.output = PalParser.parse input, 'program'
-  catch e
-    result.error = e
+    ast = PalParser.parse input, 'program'
+  catch err
+    result.error = err
+    return result
+
+  codeGenerator = new JSCodeGenerator
+  result.output = codeGenerator.compile ast
 
   result
 

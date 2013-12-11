@@ -47,7 +47,8 @@ class JSCodeGenerator
       @ident = oldIdent
 
       # Compile the body...
-      body = "#{@ident}#{@visit stmt}\n" for stmt in node.body
+      body =
+        "#{@ident}#{@visit stmt};\n" for stmt in node.body
 
       # ...and concatenate all of the above categories.
       [].concat(vars, subroutines, body)
@@ -76,7 +77,7 @@ class JSCodeGenerator
 
       [
         @ident
-        "function #{name}(#{parms.join(', ')}) {"
+        "function #{name}(#{params.join(', ')}) {"
         "#{@ident}  var _ret;"
 
         # Visit this node as a generic "body" node.
@@ -88,11 +89,22 @@ class JSCodeGenerator
         "}"
       ]
 
-    subroutine_call: (node) ->
-      params = @visit param for param in node.params
+    sub_invocation: (node) ->
+      params =
+        @visit param for param in node.params
       paramList = params.join ', '
 
-      "#{node.name}(#{paramList})"
+      subroutineName =
+        if node.name is 'writeln' then '_output' else '_' + node.name
+
+      # TODO: Handle builtins.
+      "#{subroutineName}(#{paramList})"
+
+    string: (node) ->
+      original = node.val
+      # Replace \, ', " with its backslash escape and add quotes around it.
+      # And voila, a JavaScript string literal!
+      "'#{original.replace /[\\'"]/, '//$&'}'"
 
     # I'll get around to making these later.
     binary_plus: (node) -> @makeSimpleBinOp '+'
@@ -125,6 +137,7 @@ class JSCodeGenerator
         codeList
 
     else
-      throw new Error 'No code action for object:', node
+      console.warn 'No action for', node
+      ''
 
     
