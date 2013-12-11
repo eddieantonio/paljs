@@ -13,12 +13,14 @@ compile = (fetchInput, outputter) ->
   programText = fetchInput()
 
   # Run the actual dang compiler on it:
-  {output, error} = PalCompiler.parse programText
+  results = PalCompiler programText
 
-  # Output as a JSONified string if whatever I feel like outputting at this
-  # time is NOT a string.
-  if output and not output instanceof String
-    output = JSON.stringify(output, null, 2)
+  error = results.error
+  output =
+    results.src or JSON.stringify(results.ast, null, 2)
+
+  # TODO: Figure out how to do this browser thing...
+  window.palProgram = results.fn
 
   # Dig. Output it.
   outputter error, output
@@ -54,7 +56,7 @@ $ ->
   # Debounce the compiler thingy for immediate input, after a while of
   # keyupness. I am making sense.
   delayedCompile =
-    _.debounce (-> compile(inputFetcher, outputter)), 300
+    _.debounce (-> compile(inputFetcher, outputter)), 500
 
   # Compile the input on change.
   $input.on 'keyup copy cut paste change', ->
