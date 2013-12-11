@@ -43,7 +43,6 @@ class JSCodeGenerator
 
 
 
-
   # Here's the big array of AST nodes and the actions that should be called
   # when they are visited. Each each action should return either a list or a
   # string of JavaScript code.
@@ -138,6 +137,12 @@ class JSCodeGenerator
 
       condition.concat [body, @indent, '}']
 
+    # Assignment may be a statement in Pal, but it's just an operator in
+    # JavaScript. I could have used @makeBinOp, but I wanted a more customized
+    # appearance. Not that it'll matter to eval().
+    assign: (node) ->
+      [@visit(node.left), ' = ', @visit(node.right)]
+
     sub_invocation: (node) ->
       params =
         @visit param for param in node.params
@@ -150,6 +155,12 @@ class JSCodeGenerator
         if node.name is 'writeln' then '_output' else '_' + node.name
 
       "#{subroutineName}(#{paramList})"
+
+    # Variables are complicated, but I'm just going to do the following naïve
+    # thing: Just spit out a dollar and the name. The dollar is so that people
+    # don't name a Pal variable 'return' and make unparsable JavaScript.
+    variable: (node) ->
+      '$' + node.name
 
     # Got to place strings in quotes and escape characters.
     string: (node) ->
