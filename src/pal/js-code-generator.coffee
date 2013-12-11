@@ -9,8 +9,10 @@
 
 class JSCodeGenerator
   constructor: ->
+    # Initiailize the... indent amount, I guess.
     @indentAmount = '  '
 
+  # Compiles the given AST.
   compile: (ast) ->
     # I guess I should initialize the indent or something.
     @indent = '  '
@@ -18,6 +20,10 @@ class JSCodeGenerator
     # I don't know what else to do other than visit the node.
     # Regardless... here it is:
     @visit ast
+
+  ##
+  # Static helpers -- used for generation of this class def.
+  ##
 
   # Returns an action for a JS binary operator.
   @makeBinOp: (binop) -> (node) ->
@@ -30,7 +36,7 @@ class JSCodeGenerator
     # TODO: Get the names of the parameters...
     params = []
 
-    { name } = node
+    name = @subroutineNameFor node.name
     header = "function #{name}(#{params.join(', ')}) {\n"
 
     # Visit the body of the subroutine, calling the given wrapper function
@@ -42,6 +48,9 @@ class JSCodeGenerator
     [@indent, header, body, @indent, '}\n']
 
 
+  ##
+  # Actions
+  ##
 
   # Here's the big array of AST nodes and the actions that should be called
   # when they are visited. Each each action should return either a list or a
@@ -90,7 +99,7 @@ class JSCodeGenerator
     procedure: @makeWrappedSubroutine (body) -> body
 
     'function': @makeWrappedSubroutine (body, node) ->
-      retName = '$$' + node.name
+      retName = @variableNameFor node.name
 
       [
         @indent
@@ -151,16 +160,18 @@ class JSCodeGenerator
       # Hack! I should have a table of builtins, but instead, I have only
       # implemented this one and only method.
       subroutineName =
-        # TODO: Handle builtins.
-        if node.name is 'writeln' then '_output' else '_' + node.name
+        # TODO: Handle other builtins.
+        if node.name is 'writeln'
+          '_output'
+        else
+          @subroutineNameFor node.name
 
       "#{subroutineName}(#{paramList})"
 
     # Variables are complicated, but I'm just going to do the following naïve
     # thing: Just spit out a dollar and the name. The dollar is so that people
-    # don't name a Pal variable 'return' and make unparsable JavaScript.
-    variable: (node) ->
-      '$' + node.name
+    # don't name a Pal variable 'return' and generate invalid JavaScript.
+    variable: (node) -> @variableNameFor(node.name)
 
     # Got to place strings in quotes and escape characters.
     string: (node) ->
@@ -233,6 +244,10 @@ class JSCodeGenerator
       console.warn 'No action for', node
       ''
 
+  ##
+  # Additional utilities
+  ##
+
   # Executes the function, incrementing the indent while it's running. When
   # the function returns, the original identation is restored.
   # Returns the result of the given function.
@@ -244,4 +259,8 @@ class JSCodeGenerator
       @indent = oldIdent
       result
 
+  # Returns the 'standardized' variable name for the given string.
+  variableNameFor: (str) -> '$' + str
+  # Returns the 'standardized' subroutine name for the given string.
+  subroutineNameFor: (str) -> '_' + str
 
