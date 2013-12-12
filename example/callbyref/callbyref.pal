@@ -1,0 +1,32 @@
+{
+    Pal call-by-reference stuff.
+}
+program byref(input, output);
+type
+    first = array[1..10] of integer;
+    second = array[1..10] of first;
+var
+    a: integer;
+    b: first;
+    c: second;
+
+    procedure p1(var x: integer);
+    begin
+        writeln(x);
+        x := 1;
+    end;
+    procedure p2(var x: first);
+    begin
+        x[1] := 3;
+        p1(x[2])
+    end;
+
+begin
+    a := 42;
+
+    p1(a);
+    p2(b);
+    p2(c[8])
+
+end.
+{ vim:set ft=pascal: }
