@@ -4,7 +4,7 @@
 
 {
 
-  /* Recursivly collapses binary nodes with left-to-right associtavity. */
+  /* Recursively collapses binary nodes with left-to-right associativity. */
   function makeRightExpression(expressions) {
     var currentExpression = expressions.shift();
 
@@ -155,17 +155,21 @@ type_decl
       };
     }
 
-/* TODO: this is wrong, actually... */
 var_decl
-  = name:identifier colon type:type_expr smcln  {
+  = names:identifier_list colon type:type_expr smcln  {
       return {
         ast: 'variable_declaration',
         loc: [line, column],
 
-        name: name,
+        names: names,
         type: type
       };
     }
+
+identifier_list
+  = first:identifier rest:(comma id:identifier { return id; })* {
+      return [first].concat(rest);
+  }
 
 
 /*
@@ -472,7 +476,7 @@ id_text
     }
 
 
-integer
+integer "integer"
   = d:digits __ {
       return {
         ast: 'integer',
@@ -492,13 +496,13 @@ real "real"
       }
     }
 
-digits "digits"
+digits
   = chars:[0-9]+ {
       return chars.join('');
     }
 
 
-string
+string "string"
   = "'" text:(string_char*) "'" __ {
       return {
          ast: 'string',
@@ -561,9 +565,13 @@ token_sep
 
 comment "comment"
   = multiline_comment
+  / cpp_comment
 
 multiline_comment "comment"
   = "{" ( !"}" . )* "}"
+
+cpp_comment
+  = "//" (!eol .)*
 
 whitespace "whitespace"
   = [ \t]
