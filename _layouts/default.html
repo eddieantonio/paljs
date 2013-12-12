@@ -21,9 +21,10 @@
 
     <div class="container">
       <header class="site-header">
-        <h1 class="title"><a href="/">{{ site.name }}</a></h1>
+        <h1 class="title"><a href="{{ site.baseurl }}/">{{ site.name }}</a></h1>
         <nav class="header-nav"> <ul>
-            <li> <a class="extra" href="/">home</a> </li>
+            <li> <a class="extra" href="{{ site.baseurl }}/">home</a> </li>
+            <li> <a class="extra" href="{{ site.baseurl }}/README.html">readme</a> </li>
         </ul> </nav>
       </header>
 
