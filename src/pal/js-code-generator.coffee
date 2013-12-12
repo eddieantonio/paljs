@@ -173,6 +173,17 @@ class JSCodeGenerator
     # don't name a Pal variable 'return' and generate invalid JavaScript.
     variable: (node) -> @variableNameFor(node.name)
 
+    array_access: (node) ->
+      subexpressions =
+        "[#{@visit(index)}]" for index in node.expressions
+
+      # TODO: Bounds checking.
+      [@visit(node.apropos)].concat(subexpressions)
+
+    # Turns a record access into a 
+    record_access: (node) ->
+      [@visit(node.apropos), '[', @visit(node.field, 'string'), ']']
+
     # Got to place strings in quotes and escape characters.
     string: (node) ->
       original = node.val
