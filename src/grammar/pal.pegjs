@@ -3,26 +3,49 @@
  */
 
 {
+  var collapseRightExpression, collapseLeft;
 
-  /* Recursively collapses binary nodes with left-to-right associativity. */
-  function makeRightExpression(expressions) {
-    var currentExpression = expressions.shift();
+  /* Warning. The following helpers are much too clever for their own good. */
+  function makeCollapser(fieldName, methodName) {
+    var reduce;
 
-    if (!expressions.length) {
+    /* Recursively collapses binary nodes with left-to-right associativity. */
+    reduce = function (expressions) {
+      var currentExpression = expressions[methodName]();
+
+      /* If we should reduce... then do it! */
+      if (expressions.length) {
+        currentExpression[fieldName] = reduce(expressions);
+      }
+
       return currentExpression;
     }
 
-    currentExpression.right = makeRightExpression(expressions);
-
-    return currentExpression;
-
+    return reduce;
   }
+
+  /* Collapses a list of expressions from left-to-right; each added child
+   * expression is called 'right'. */
+  collapseRightExpression = makeCollapser('right', 'shift');
+  /* Collapses a list of expressions from right-to-left; each added child
+   * expression is called 'apropos' (think 'of', but unnecessarily fancy). */
+  collapseLeft = makeCollapser('apropos', 'pop');
 
   /* Collapses binary and unary expressions. */
   function collapseExpression(expressions, final) {
-    expressions.push(final);
+    if (expressions.length) {
+      expressions.push(final);
+      return collapseRightExpression(expressions);
+    }
+    return final;
+  }
 
-    return makeRightExpression(expressions);
+  function collapseVariable(expressions, leaf) {
+    if (expressions.length) {
+      expressions.unshift(leaf);
+      return collapseLeft(expressions);
+    }
+    return leaf;
   }
 
 }
@@ -359,13 +382,13 @@ unsigned_const
  */
 
 variable
-  = name:identifier right:variable_rest* {
-     return {
+  = name:identifier rest:variable_rest* {
+      return collapseVariable(rest, {
        ast: 'variable',
        loc: [line, column],
 
        name: name,
-     };
+     });
   }
 
 variable_rest
@@ -374,7 +397,12 @@ variable_rest
 
 array_access
   = lbrack list:expression_list rbrack {
-      return list;
+      return {
+        ast: 'array_access',
+        loc: [line, column],
+
+        expressions: list,
+      };
     }
 
 expression_list
