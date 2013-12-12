@@ -59,7 +59,7 @@ class JSCodeGenerator
     program: (node) ->
       [
         # Emit the header of the self-contained function
-        '(function (_input, _output) {\n'
+        '(function (input, output) {\n'
         # Print variables and the body.
         @visit node.declarations
         # Emit the bottom
@@ -74,8 +74,7 @@ class JSCodeGenerator
     # of any function, subroutine, etc.
     # Assumes indent is set at the correct level.
     $body: (node) ->
-      # TODO: visit the var declarations.
-      vars = []
+      vars = @visit node.vars, '$stmt'
 
       # Compile all of the subroutines.
       subroutines =
@@ -146,6 +145,10 @@ class JSCodeGenerator
 
       condition.concat [body, @indent, '}']
 
+    # These two statements map 1-to-t with JS statements.
+    'continue': (node) -> 'continue'
+    exit: (node) -> 'break'
+
     # Assignment may be a statement in Pal, but it's just an operator in
     # JavaScript. I could have used @makeBinOp, but I wanted a more customized
     # appearance. Not that it'll matter to eval().
@@ -162,11 +165,18 @@ class JSCodeGenerator
       subroutineName =
         # TODO: Handle other builtins.
         if node.name is 'writeln'
-          '_output'
+          'output'
         else
           @subroutineNameFor node.name
 
       "#{subroutineName}(#{paramList})"
+
+    variable_declaration: (node) ->
+      # TODO: There should be some form of intiailization, but for that, I'd
+      # need to know the types of things.
+      nameList = (@variableNameFor name for name in  node.names)
+
+      ['var ', nameList.join(', ')]
 
     # Variables are complicated, but I'm just going to do the following naïve
     # thing: Just spit out a dollar and the name. The dollar is so that people
@@ -180,9 +190,9 @@ class JSCodeGenerator
       # TODO: Bounds checking.
       [@visit(node.apropos)].concat(subexpressions)
 
-    # Turns a record access into a 
+    # Turns a record access into a
     record_access: (node) ->
-      [@visit(node.apropos), '[', @visit(node.field, 'string'), ']']
+      [@visit(node.apropos), '[', @visit({val: node.field}, 'string'), ']']
 
     # Got to place strings in quotes and escape characters.
     string: (node) ->
