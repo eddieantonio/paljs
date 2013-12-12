@@ -211,6 +211,7 @@ statements
 statement
   = conditional
   / while_loop
+  / structured_statement
   / compound_stat
   / sub_invocation
   / assignment
@@ -227,9 +228,24 @@ conditional
 
         condition: cond,
         consequent: cons,
-        alternative: alt || []
+        alternative: alt || null
       };
     }
+
+structured_statement
+  = exit {
+      return {
+        ast: 'exit',
+        loc: [line, column],
+      }
+    }
+  / continue {
+      return {
+        ast: 'continue',
+        loc: [line, column],
+      }
+    }
+
 
 while_loop
   = while cond:expression do body:statement {
@@ -345,7 +361,7 @@ factor
     }
   / sub_invocation
   / variable
-  / lparen expression rparen
+  / lparen x:expression rparen { return x; }
   / unsigned_const
 
 
@@ -635,6 +651,7 @@ string_escape
 
 escaped_char
   = "n"  { return "\n"; }
+  / "t"  { return "\t"; }
   / "'"  { return "'"; }
   / "\\" { return "\\"; }
 
