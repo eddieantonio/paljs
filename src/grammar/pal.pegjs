@@ -50,6 +50,8 @@
 
 }
 
+
+
 program
   = __ head:program_head decls:declarations period {
       return {
@@ -133,7 +135,7 @@ subroutine
 
 
 function_decl
-  = function name:identifier params:formal_param_list colon type:simple_type {
+  = function name:identifier params:formal_param_list colon type:named_type {
       return {
         ast: 'function',
         loc: [line, column],
@@ -425,9 +427,14 @@ record_access
  * Type declarations
  */
 type_expr
-  = simple_type
+  = structured_type
+  / simple_type
 
 simple_type
+  = named_type
+  / enumeration
+
+named_type
   = name:identifier {
       return {
         ast: 'named_type',
@@ -436,6 +443,73 @@ simple_type
         name: name
       };
     }
+
+enumeration
+  = lparen names:identifier_list rparen {
+      return {
+        ast: 'enumeration',
+        loc: [line, column],
+
+        names: names
+      };
+    }
+
+structured_type
+  = array_type
+  / record_type
+
+array_type
+  = array lbrack index:index_type rbrack of element:type_expr {
+      return {
+        ast: 'array_type',
+        loc: [line, column],
+
+        indexType: index,
+        elementType: element
+      };
+    }
+
+index_type
+  = subrange_type
+  / named_type
+
+subrange_type
+  = left:expression range right:expression {
+      return {
+        ast: 'subrange_type',
+        loc: [line, column],
+
+        lower: left,
+        upper: right
+      };
+    }
+
+record_type
+  = record fields:field_list end {
+      return {
+        ast: 'record_type',
+        loc: [line, column],
+
+        fields: fields
+      };
+    }
+
+field_list
+  = first:field rest:(smcln f:field { return f; })* {
+      return [first].concat(rest);
+    }
+
+field
+  = name:identifier colon type:type_expr {
+      return {
+        'ast': 'record_field',
+        loc: [line, column],
+
+        name: name,
+        type: type
+      };
+    }
+
 
 
 /*
@@ -483,13 +557,21 @@ mod       = "mod" __
 or        = "or" __
 and       = "and" __
 not       = "not" __
+array     = "array" __
+of        = "of"__
+record    = "record"__
+continue  = "continue"__
+exit      = "exit"__
 
 /* Great big list of keywords. These cannot be matched by an identifier. */
 keyword =
   "begin" / "end" /
   "const" / "type" / "var" / "procedure" / "function" /
   "if" / "then" / "else" / "while" / "do" /
-  "div" / "mod" / "or" / "and" / "not"
+  "div" / "mod" / "or" / "and" / "not" /
+  "array" / "of" / "record" /
+  "continue" / "exit"
+
 
 /*
  * Even more terminals!
@@ -569,7 +651,7 @@ formal_params
     }
 
 formal_param
-  = v:var? name:identifier colon type:simple_type {
+  = v:var? name:identifier colon type:named_type {
       return {
         ast: 'formal_parameter',
         loc: [line, column],
