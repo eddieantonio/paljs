@@ -597,9 +597,7 @@ identifier "identifier"
   = !keyword text:id_text __ { return text; }
 
 id_text
-  = text:([A-Za-z][A-Za-z0-9]*) {
-      return text[0] + text[1].join('');
-    }
+  = $(ALPHA (ALPHA/DIGIT)*)
 
 
 integer "integer"
@@ -613,38 +611,36 @@ integer "integer"
     }
 
 real "real"
-  = d:digits "." f:digits __ {
+  = num:$(digits "." DIGIT+) __ {
       return {
         ast: 'real',
         loc: [line, column],
 
-        val: parseFloat(d + '.' + f, 10)
+        val: parseFloat(num, 10)
       }
     }
 
 digits
-  = chars:[0-9]+ {
-      return chars.join('');
-    }
+  = $(NZDIGIT DIGIT*)
+  / "0"
 
 
 string "string"
-  = "'" text:(string_char*) "'" __ {
+  = "'" text:$(string_char*) "'" __ {
       return {
-         ast: 'string',
-         loc: [line, column],
+        ast: 'string',
+        loc: [line, column],
 
-         val: text.join('')
+        val: text.join('')
       }
     }
-
 
 string_char
   = normal_string_char
   / string_escape
 
 normal_string_char
-  = !("'" / eol / "\\") char:. { return char; }
+  = !("'" / EOL / "\\") char:. { return char; }
 
 string_escape
   = "\\" char:escaped_char { return char; }
@@ -655,6 +651,19 @@ escaped_char
   / "'"  { return "'"; }
   / "\\" { return "\\"; }
 
+
+/*
+ * Basic lexical entities.
+ */
+
+ALPHA
+  = [A-Z]i
+
+DIGIT "digit"
+  = [0-9]
+
+NZDIGIT "non-zero digit"
+  = [1-9]
 
 /*
  * Formal parameter lists.
