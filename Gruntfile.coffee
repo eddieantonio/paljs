@@ -1,6 +1,8 @@
 # Gruntfile for Pal.JS
+
 module.exports = (grunt) ->
-  grunt.initConfig
+  # Normal config:
+  config =
     pkg: grunt.file.readJSON 'package.json'
     copyright: 'Pal.JS: 2013 (C) Eddie Antonio Santos. MIT license.'
 
@@ -10,9 +12,6 @@ module.exports = (grunt) ->
       paljs:
         dest: 'build/pal.js'
         src: ['src/pal/**/*.coffee']
-      ui:
-        dest: 'build/pal-ui.js'
-        src: ['src/ui/**/*.coffee']
 
     peg:
       options:
@@ -35,9 +34,6 @@ module.exports = (grunt) ->
       paljs:
         files:
           'js/pal.min.js':      ['<%= concat.paljs.dest %>']
-      ui:
-        files:
-          'js/pal-ui.min.js':   ['<%= coffee.ui.dest %>']
 
     watch:
       src:
@@ -46,11 +42,11 @@ module.exports = (grunt) ->
       grammar:
         files: ["<%= peg.paljs.src %>"]
         tasks: ['pal-grammar']
-      ui:
-        files: ["<%= coffee.ui.src %>"]
-        tasks: ['ui']
 
+  # Extend the config with  extra grunt options from src/grunt-extra directory.
+  require('./src/grunt-extra')(config)
 
+  grunt.initConfig config
 
   # Tasks to load:
   grunt.loadNpmTasks 'grunt-peg'
