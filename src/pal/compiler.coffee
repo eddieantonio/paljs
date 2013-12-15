@@ -1,5 +1,8 @@
 # This is the main entry point for the Pal compiler.
 
+PalParser = require './parser'
+JSCodeGenerator = require './js-code-generator'
+
 # Call PalCompiler with a string and if all goes well, get back a result
 # object with:
 #
@@ -81,15 +84,5 @@ PalCompiler.createFn = (jsCode, cb) ->
 
   cb null, fn
 
-
-
-# Installs as a global in a browser or sets this as the main export in Node.
-install = (obj, name) ->
-  switch
-    when module?.exports?
-      module.exports = obj
-    when window?
-      window[name] = obj
-
-# Install to whateve environment this.
-install PalCompiler, 'PalCompiler'
+# Export the compiler code.
+module.exports = PalCompiler

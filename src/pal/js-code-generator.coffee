@@ -285,3 +285,7 @@ class JSCodeGenerator
   # Returns the 'standardized' subroutine name for the given string.
   subroutineNameFor: (str) -> '_' + str
 
+
+
+# Export the main class.
+module.exports = JSCodeGenerator

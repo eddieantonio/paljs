@@ -5,35 +5,40 @@ module.exports = (grunt) ->
   config =
     pkg: grunt.file.readJSON 'package.json'
     copyright: 'Pal.JS: 2013 (C) Eddie Antonio Santos. MIT license.'
+    lib: 'lib'
+    build: 'build'
 
     coffee:
-      options:
-        join: yes
       paljs:
-        dest: 'build/pal.js'
+        options:
+          join: no
+        dest: '<%= lib %>/'
         src: ['src/pal/**/*.coffee']
 
     peg:
-      options:
-        trackLineAndColumn: yes
-        exportVar: 'PalParser'
       paljs:
+        options:
+          trackLineAndColumn: yes
+          exportVar: 'module.exports'
         src: 'src/grammar/pal.pegjs',
-        dest: 'build/pal.tab.js'
+        # The destination is in src/ because that makes it easy to `require`
+        # from other CoffeeScript things.
+        dest: 'src/pal/parser.js'
 
-    concat:
-      options:
-        seperator: ';'
+    browserify:
       paljs:
-        src:  ['<%= peg.paljs.dest %>', '<%= coffee.paljs.dest %>']
-        dest: 'js/pal.js'
+        options:
+          transform: ['coffeeify']
+          extensions: '.coffee'
+        src: ['./src/pal/browser.coffee']
+        dest: 'pal.js'
 
     uglify:
       options:
         banner: "/*!<%= copyright %>*/\n"
       paljs:
         files:
-          'js/pal.min.js':      ['<%= concat.paljs.dest %>']
+          'pal.min.js':  ['<%= browserify.paljs.dest %>']
 
     watch:
       src:
@@ -54,12 +59,13 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-concat'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-watch'
+  grunt.loadNpmTasks 'grunt-browserify'
 
 
   # Builds the client-side compiler thing.
   grunt.registerTask 'pal-concat', ['concat:paljs']
   grunt.registerTask 'pal-src', ['coffee:paljs', 'pal-concat']
-  grunt.registerTask 'pal-grammar', ['peg', 'pal-concat']
+  grunt.registerTask 'pal-grammar', ['peg:pegjs']
   grunt.registerTask 'paljs', ['peg', 'pal-src']
 
   # Builds the UI files and ugifilies.
