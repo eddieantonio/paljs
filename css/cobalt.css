@@ -284,6 +284,16 @@ code, .code {
     color: #B34040;
 }
 
+.info {
+    color: #c0c0c0;
+    font-style: italic;
+}
+
+.console-lines .info {
+    padding: 4px 0px;
+    font-size: 75%;
+}
+
 .button-list {
     display: inline-block;
     text-align: center;

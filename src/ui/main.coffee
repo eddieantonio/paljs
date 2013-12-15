@@ -12,7 +12,7 @@ preventDefault = (fn) -> (event) ->
   event.preventDefault()
   fn.apply @, arguments
 
-# Next functions taken from:
+# This function based on this answer:
 # http://stackoverflow.com/a/14254253
 isChar = (e) ->
   modifier =
@@ -20,6 +20,14 @@ isChar = (e) ->
   isAlphanumeric =
     (65 <= e.keyCode <= 90) or (97 <= e.keyCode <= 122)
   not modifier and isAlphanumeric
+
+# Calls the function and times how long it took to complete.
+timeIt = (fn) ->
+  before = performance.now()
+  fn()
+  after = performance.now()
+
+  after - before
 
 # Given an element that contains a "button list", turns all links with
 # 'data-panel' attribute into button things enabling the given id.
@@ -42,17 +50,19 @@ makeButtonBar = ($buttonBar, $outputWrapper) ->
     # ...and this button.
     $this.addClass 'active'
 
-
 # Calls 'inputFetcher', and compiles the string it returns. Then calls
 # 'outputter' with an error in the first param or the second param the
 # compiled output as a string.
 compile = (fetchInput, outputter) ->
   programText = fetchInput()
+  results = null
 
-  console.time 'Compilation'
   # Run the actual dang compiler on it:
-  results = PalCompiler programText
-  console.timeEnd 'Compilation'
+  elapsedTime =
+    timeIt ->
+      results = PalCompiler programText
+
+  results.time = elapsedTime
 
   # Dig. Output it.
   outputter results
@@ -64,11 +74,11 @@ makeInputFetcher = ($el) -> ->
 
 # Given an output element returns a function that...
 # Places `output` on the pal-output div, in a pre.
-makeOutputter = (elements) ->
+makeOutputter = (elements, $eventSource) ->
   [$console, $js, $ast] = elements
 
   # Adds another line to the console output.
-  newConsoleLine = (line) ->
+  newConsoleLine = (line, cls='') ->
     $container = $console.find('.console-lines')
     $line = $('<li>').text(line)
     $container.append $line
@@ -83,13 +93,50 @@ makeOutputter = (elements) ->
     $line = newConsoleLine text
     $line.addClass 'error'
 
+  # Standard outputter for stuff and things.
+  writeln = ->
+    rawArgs = _.toArray(arguments)
+    # Coerce all arugments and create one line.
+    line = _(rawArgs).map((arg) ->
+      # Coerce to a string.
+      arg + ''
+    ).join('')
+
+    newConsoleLine line
+
+  # Given JavaScript source, returns a function ready to call that will
+  # execute the program and output on the console.
+  makeRunnableProgram = (src) ->
+    fn = eval src
+    # The returned program takes functions that should provide input and
+    # output. Aside from 'prompt'... not sure what kind of blocking input I
+    # could use. As for output, just print a new console line.
+    ->
+      fn(null, writeln)
+
+  rebindRunner = (src) ->
+    # Compile the program into native JavaScript.
+    program = makeRunnableProgram src
+
+    $eventSource.off 'paljs:run'
+    $eventSource.on 'paljs:run', ->
+      program()
+
   # This is the outputter:
   (result) ->
     if result.error?
       showError result.error.toString()
-    else
-      updatePlainTextDisplay $js, result.src
-      updatePlainTextDisplay $ast, JSON.stringify(result.ast, null, 2)
+      return
+
+    # No error? Update all of the displays.
+    updatePlainTextDisplay $js, result.src
+    updatePlainTextDisplay $ast, JSON.stringify(result.ast, null, 2)
+    rebindRunner(result.src)
+
+    # Place a nice little 'compiled' line on the output.
+    $line = newConsoleLine "Compiled in #{result.time}ms"
+    $line.addClass 'info'
+
 
 $ ->
   # These are the two elements on the page where stuff happens.
@@ -97,10 +144,11 @@ $ ->
   $console = $ '#console'
   $astDisplay = $ '#ast'
   $jsDisplay = $ '#js'
+  $runEventSource = $ 'a[href="#!run"]'
 
   # These will be fed to the compiler dibblydank.
   inputFetcher = makeInputFetcher $input
-  outputter = makeOutputter [$console, $jsDisplay, $astDisplay]
+  outputter = makeOutputter [$console, $jsDisplay, $astDisplay], $runEventSource
 
   # Debounce the compiler thingy for immediate input, after a while of
   # keyupness. I am making sense.
@@ -116,6 +164,10 @@ $ ->
   $input.on 'keypress', (event) ->
     if isChar event
       $input.trigger 'change'
+
+  # Tell people to run the code when the 'run event source' is clicked
+  $runEventSource.on 'click', preventDefault (event) ->
+    $(@).trigger 'paljs:run'
 
   # Compile the input for the first time.
   $input.trigger 'change'
