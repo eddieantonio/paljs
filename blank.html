@@ -11,24 +11,99 @@
 
         <header class='header clearfix'>
             <div class='logo accent-links'>
-                <h1> <a href='#'>Pal.JS</a> </h1>
+                <h1 class="logo-text"> <a href='#'>Pal.JS</a> </h1>
             </div>
 
             <nav class='header-nav'> 
                 <ul class='curt-nav'>
                     <li> <a href='#'>the language</a></li>
                     <li> <a href='#'>the reason</a></li>
-                    <li> <a href='#'>the pantyhouse</a></li>
-                    <li> <a href='#'>the definite article</a></li>
                 </ul>
              </nav>
            </header>
 
            <div class='content'>
-            <div class='dashboard'>
-                <a href='#!run'>Run</a>
-            </div>
-            <div class='panels'></div>
+
+               <div class='workspace'>
+                    <div class='dashboard accent-links'>
+                        <a class="big-button" href='#!run'>Run</a>
+                    </div>
+
+                    <div class='panels clearfix'>
+                        <div class='panel left'>
+                            <div class='editor code'>
+                                <textarea>program lcg(input, output);
+{
+    Linear congruential generator, taken from Wikipedia.
+    &lt;http://en.wikipedia.org/wiki/Linear_congruential_generator&gt;
+}
+
+const
+    InitialSeed = 30203;
+
+var
+    GlobalSeed: integer;
+
+function PseudoRand(var seed: integer): integer;
+const
+    m = 4294967296; { The 'modulus' }
+    a = 1103515245; { The 'multiplier' }
+    c = 12345;      { The 'increment' }
+begin
+    seed := (a * seed + c) mod m;
+    PseudoRand := seed
+end;
+
+procedure Main();
+    { The main procedure. Writes 10 random integers per line. }
+var
+    i: integer;
+begin
+
+    {
+      Pal officially does not support this:
+
+        for i := 1 to 10 do
+            writeln((PseudoRand(GlobalSeed) mod 100):3)
+
+      But it does support this:
+    }
+    i := 1;
+    while i &lt;= 10 do
+        begin
+            writeln(PseudoRand(GlobalSeed) mod 100);
+            i := i + 1
+        end
+
+end;
+
+
+{ The entry point of the program: }
+begin
+    { Initialize the random seed. }
+    GlobalSeed := InitialSeed;
+    Main()
+end.
+
+{ vim: set ft=pascal: } </textarea>
+                            </div>
+                        </div>
+
+                        <div class='panel right'>
+                            <div class='output-wrapper'>
+                                <div class='output active' id='console'></div>
+                                <div class='output' id='js'></div>
+                                <div class='output' id='ast'></div>
+                            </div>
+                            <nav class='output-selector'> <ul>
+                                <li> <a href='#'> Console </a> </li>
+                                <li> <a href='#'> JS </a> </li>
+                                <li> <a href='#'> AST </a> </li>
+                            </ul> </nav>
+                        </div>
+
+                    </div>
+               </div>
            </div>
 
            <footer class='footer'>
