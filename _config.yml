@@ -1,0 +1,8 @@
+name: Pal.JS
+
+baseurl: '/paljs'
+exclude:
+  - node_modules
+
+markdown: kramdown
+pygments: true
