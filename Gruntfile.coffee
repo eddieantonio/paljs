@@ -6,7 +6,6 @@ module.exports = (grunt) ->
     pkg: grunt.file.readJSON 'package.json'
     copyright: 'Pal.JS: 2013 (C) Eddie Antonio Santos. MIT license.'
     lib: 'lib'
-    build: 'build'
 
     coffee:
       paljs:
@@ -55,26 +54,24 @@ module.exports = (grunt) ->
 
   # Tasks to load:
   grunt.loadNpmTasks 'grunt-peg'
-  grunt.loadNpmTasks 'grunt-contrib-coffee'
-  grunt.loadNpmTasks 'grunt-contrib-concat'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-browserify'
 
 
   # Builds the client-side compiler thing.
-  grunt.registerTask 'pal-concat', ['concat:paljs']
-  grunt.registerTask 'pal-src', ['coffee:paljs', 'pal-concat']
-  grunt.registerTask 'pal-grammar', ['peg:pegjs']
+  grunt.registerTask 'pal-src', []
+  grunt.registerTask 'pal-grammar', ['peg:paljs']
   grunt.registerTask 'paljs', ['peg', 'pal-src']
 
   # Builds the UI files and ugifilies.
+  # TODO: this should be specified only in the gh-pages branch. Somehow.
   grunt.registerTask 'ui', ['coffee:ui']
   # Builds EVERYTHING.
-  grunt.registerTask 'build', ['paljs', 'ui']
+  grunt.registerTask 'build', ['paljs']
   # Prepares the products of the build for distribution.
   grunt.registerTask 'dist', ['build', 'uglify']
 
   # Default: Build the project.
-  grunt.registerTask 'default', ['dist']
+  grunt.registerTask 'default', ['build']
 
