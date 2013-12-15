@@ -6,14 +6,53 @@
 #
 # Eddie Antonio Santos <easantos@ualberta.ca>
 
+# Intended to wrap an event handler.
+# Calls event.preventDefault() on it
+preventDefault = (fn) -> (event) ->
+  event.preventDefault()
+  fn.apply @, arguments
+
+# Next functions taken from:
+# http://stackoverflow.com/a/14254253
+isChar = (e) ->
+  modifier =
+    (e.ctrlKey) or (e.altKey) or (e.metaKey)
+  isAlphanumeric =
+    (65 <= e.keyCode <= 90) or (97 <= e.keyCode <= 122)
+  not modifier and isAlphanumeric
+
+# Given an element that contains a "button list", turns all links with
+# 'data-panel' attribute into button things enabling the given id.
+makeButtonBar = ($buttonBar, $outputWrapper) ->
+  $buttons = $buttonBar.find 'a[data-panel]'
+  $outputPanels = $outputWrapper.find '.output'
+
+  # Make each click toggle the panel
+  $buttons.on 'click', preventDefault (event) ->
+    $this = $ @
+    panelName = $this.data 'panel'
+
+    # Deactivate all buttons and panels.
+    $buttons.removeClass 'active'
+    $outputPanels.removeClass 'active'
+
+    # Activate the panel...
+    $panel = $('#'+panelName)
+    $panel.addClass 'active'
+    # ...and this button.
+    $this.addClass 'active'
+
+
 # Calls 'inputFetcher', and compiles the string it returns. Then calls
 # 'outputter' with an error in the first param or the second param the
 # compiled output as a string.
 compile = (fetchInput, outputter) ->
   programText = fetchInput()
 
+  console.time 'Compilation'
   # Run the actual dang compiler on it:
   results = PalCompiler programText
+  console.timeEnd 'Compilation'
 
   # Dig. Output it.
   outputter results
@@ -68,9 +107,15 @@ $ ->
   delayedCompile =
     _.debounce (-> compile(inputFetcher, outputter)), 500
 
+  # Bind the button bar/panel events
+  makeButtonBar $('.output-selector'), $('.output-wrapper')
+  
   # Compile the input on change.
-  $input.on 'keyup copy cut paste change', ->
+  $input.on 'copy cut paste change', ->
     delayedCompile()
+  $input.on 'keypress', (event) ->
+    if isChar event
+      $input.trigger 'change'
 
   # Compile the input for the first time.
   $input.trigger 'change'
