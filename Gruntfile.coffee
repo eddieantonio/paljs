@@ -39,10 +39,18 @@ module.exports = (grunt) ->
         files:
           'pal.min.js':  ['<%= browserify.paljs.dest %>']
 
+    mochaTest:
+      paljs:
+        options:
+          reporter: 'spec'
+          require: 'coffee-script'
+          clearRequireCache: yes
+        src: ['test/**/*.coffee']
+
     watch:
       src:
-        files: ["<%= coffee.paljs.src %>"]
-        tasks: ['pal-src']
+        files: ["<%= coffee.paljs.src %>", "<%= mochaTest.paljs.src %>"]
+        tasks: ['mochaTest:paljs']
       grammar:
         files: ["<%= peg.paljs.src %>"]
         tasks: ['pal-grammar']
@@ -57,10 +65,11 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-browserify'
+  grunt.loadNpmTasks 'grunt-mocha-test'
 
 
   # Builds the client-side compiler thing.
-  grunt.registerTask 'pal-src', []
+  grunt.registerTask 'pal-src', ['mochaTest:paljs']
   grunt.registerTask 'pal-grammar', ['peg:paljs']
   grunt.registerTask 'paljs', ['peg', 'pal-src']
 
