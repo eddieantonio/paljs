@@ -1,0 +1,155 @@
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/*
+ * Clearfix from
+ * http://www.webtoolkit.info/css-clearfix.html#.Uq1YU2TuInU
+ */
+.clearfix:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+ 
+.clearfix {
+    display: inline-block;
+}
+
+/*
+ * Main styles.
+ */
+ 
+body {
+  	font-family: 'Alegreya Sans', sans-serif;
+  	color: #f0f0f0;
+  	background-color: #222224;
+}
+
+a {text-decoration: none }
+a:link, a:visited { color: #D4DDE4;}
+a:hover, a:active { color: #f0f0f0 }
+a:hover { border-bottom: 1px #f0f0f0 dotted }
+
+/* Header styles */
+
+.header {
+	left: 0;
+	right: 0;
+	top: 0;
+	width: 100%;
+	margin-top: 16px;
+	margin-bottom: 16px;
+	background-color: #4F515F;
+	position: relative;
+}
+
+.header .logo {
+	display: block;
+	height: 32px;
+	margin-right: 8px;
+	margin-left: 8px;
+
+	margin-top: -14px;
+	float: left;
+
+}
+
+.header .logo > h1 {
+	padding: 2px 8px 0px;
+	font-size: 300%;
+	line-height: 42px;
+	background-color: #2F3038;
+	height: 42px;
+}
+
+.header-nav {
+    display: block;
+    float: left;
+    margin-top: 2px;
+    bottom: 0;
+}
+
+.curt-nav > li {
+    display: inline;
+    margin-left: 4px;
+}
+
+/* Footer styles */
+
+.footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding-bottom: 10px;
+}
+
+.footer .credits {
+	background-color: #B34040;
+	padding: 4px 8px 4px;
+	font-size: 90%;
+	text-transform: lowercase;
+}
+
+.accent-links a:link,
+.accent-links a:hover,
+.accent-links a:active,
+.accent-links a:visited {
+	font-weight: bold;
+	color: #ffffff;
+}
+
+.accent-links a:hover {
+	text-shadow: 1px 2px #F76A43;
+	border-bottom: 0;
+}
