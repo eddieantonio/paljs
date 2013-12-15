@@ -15,21 +15,37 @@ title: Pal.JS -- A broken Pal compiler
   <script src="js/pal-ui.min.js"></script>
 {% endif %}
 
-<div id="home">
-  <p> A <strong>broken</strong> Pal to JavaScript compiler! </p>
+{% include github-ribbon.html %}
+<div class="content">
 
-  <div class='panel-container clearfix'>
-    <div class='left panel'>
-      <h2> Type stuff here: </h2>
-      <textarea class="code input" id='pal-program'>program hello(input, output);
-begin
-   writeln('Hello, World!')
-end.</textarea>
+  <div class='workspace'>
+    <div class='dashboard accent-links'>
+      <a class="big-button" href='#!run'>Run</a>
     </div>
-    <div class='right panel'>
-      <h2> Maybe see JavaScript here! </h2>
-      <div class="code output do-not-be-ridiculous" id='pal-output'></div>
-    </div>
+
+    <div class='panels clearfix'>
+      <div class='panel left'>
+        <div class='editor code'>
+          <textarea>{% include sample.pal %}</textarea>
+        </div>
+      </div>
+
+      <div class='panel right'>
+        <div class='output-wrapper'>
+          <div class='output active' id='console'>
+            <ol class='code console-lines'> </ol>
+          </div>
+          <div class='output' id='js'><pre><code></code></pre>
+          <div class='output' id='ast'><pre><code></code></pre></div>
+        </div>
+      </div>
+
+      <nav class='output-selector'> <ul class="button-list">
+          <li> <a class="active" href='#'>Console</a> </li>
+          <li> <a href='#'>JS</a> </li>
+          <li> <a href='#'>AST</a> </li>
+      </ul> </nav>
+    </div>{% comment %} /panels {% endcomment %}
   </div>
 
-</div>
+</div>{% comment %} /content {% endcomment %}

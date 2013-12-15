@@ -1,0 +1,10 @@
+{
+  Pal.JS
+
+  A Pascal variant that compiles to JavaScript. Because.
+}
+
+program hello(input, output);
+begin
+  writeln('Hello, World!')
+end.
