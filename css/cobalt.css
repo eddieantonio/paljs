@@ -278,7 +278,10 @@ code, .code {
 
 .output.active {
     display: block;
+}
 
+.error {
+    color: #B34040;
 }
 
 .button-list {

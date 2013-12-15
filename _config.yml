@@ -3,6 +3,12 @@ name: Pal.JS
 baseurl: '/paljs'
 exclude:
   - node_modules
+  - src
 
 markdown: kramdown
 pygments: true
+
+meta:
+  author: eddieantonio
+  authorsite: https://github.com/eddieantonio
+  repo: https://github.com/eddieantonio/paljs
