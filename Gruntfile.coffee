@@ -7,13 +7,6 @@ module.exports = (grunt) ->
     copyright: 'Pal.JS: 2013 (C) Eddie Antonio Santos. MIT license.'
     lib: 'lib'
 
-    coffee:
-      paljs:
-        options:
-          join: no
-        dest: '<%= lib %>/'
-        src: ['src/pal/**/*.coffee']
-
     peg:
       paljs:
         options:
@@ -49,7 +42,10 @@ module.exports = (grunt) ->
 
     watch:
       src:
-        files: ["<%= coffee.paljs.src %>", "<%= mochaTest.paljs.src %>"]
+        files: [
+          "src/pal/**/*.coffee",
+          "src/pal/parser.js",
+          "<%= mochaTest.paljs.src %>"]
         tasks: ['pal-src']
       grammar:
         files: ["<%= peg.paljs.src %>"]
@@ -61,11 +57,12 @@ module.exports = (grunt) ->
   grunt.initConfig config
 
   # Tasks to load:
-  grunt.loadNpmTasks 'grunt-peg'
+  grunt.loadNpmTasks 'grunt-browserify'
+  grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-watch'
-  grunt.loadNpmTasks 'grunt-browserify'
   grunt.loadNpmTasks 'grunt-mocha-test'
+  grunt.loadNpmTasks 'grunt-peg'
 
 
   # Builds the client-side compiler thing.
@@ -75,7 +72,7 @@ module.exports = (grunt) ->
 
   # Builds the UI files and ugifilies.
   # TODO: this should be specified only in the gh-pages branch. Somehow.
-  grunt.registerTask 'ui', ['coffee:ui']
+  grunt.registerTask 'ui', ['browserify:paljs', 'coffee:ui']
   # Builds EVERYTHING.
   grunt.registerTask 'build', ['paljs', 'browserify:paljs']
   # Prepares the products of the build for distribution.
