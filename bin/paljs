@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+/**
+ * Pal compiler front-end.
+ */
+
+/* Simply delegate to the poorly-written CoffeeScript source! */
+var coffee = require('coffee-script');
+
+/* Explicitly add the require extension for some weird reason. */
+require.extensions['.coffee'] = function (module, filename) {
+  var raw = require('fs').readFileSync(filename, 'utf8');
+  var answer = coffee.compile(raw);
+  return module._compile(answer, filename);
+};
+  
+
+require('../src/pal/front-end')();
+

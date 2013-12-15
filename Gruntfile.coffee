@@ -50,7 +50,7 @@ module.exports = (grunt) ->
     watch:
       src:
         files: ["<%= coffee.paljs.src %>", "<%= mochaTest.paljs.src %>"]
-        tasks: ['mochaTest:paljs']
+        tasks: ['pal-src']
       grammar:
         files: ["<%= peg.paljs.src %>"]
         tasks: ['pal-grammar']
@@ -77,7 +77,7 @@ module.exports = (grunt) ->
   # TODO: this should be specified only in the gh-pages branch. Somehow.
   grunt.registerTask 'ui', ['coffee:ui']
   # Builds EVERYTHING.
-  grunt.registerTask 'build', ['paljs']
+  grunt.registerTask 'build', ['paljs', 'browserify:paljs']
   # Prepares the products of the build for distribution.
   grunt.registerTask 'dist', ['build', 'uglify']
 
