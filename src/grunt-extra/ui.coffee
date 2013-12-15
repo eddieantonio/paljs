@@ -13,5 +13,5 @@ module.exports =
   watch:
     ui:
       files: ["<%= coffee.ui.src %>"]
-      tasks: ['ui']
+      tasks: ['coffee:ui']
 

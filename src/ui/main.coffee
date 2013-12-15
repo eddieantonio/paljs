@@ -15,15 +15,8 @@ compile = (fetchInput, outputter) ->
   # Run the actual dang compiler on it:
   results = PalCompiler programText
 
-  error = results.error
-  output =
-    results.src or JSON.stringify(results.ast, null, 2)
-
-  # TODO: Figure out how to do this browser thing...
-  window.palProgram = results.fn
-
   # Dig. Output it.
-  outputter error, output
+  outputter results
 
 # Given an input element...
 # Gets the text from the textarea.
@@ -32,26 +25,43 @@ makeInputFetcher = ($el) -> ->
 
 # Given an output element returns a function that...
 # Places `output` on the pal-output div, in a pre.
-makeOutputter = ($el) -> (err, output) ->
-  $output =
-    if err
-      console.log err
-      $('<p>').text(err.toString())
-    else
-      # This is what people use templates for, but... :/
-      $('<pre>')
-        .html(output)
+makeOutputter = (elements) ->
+  [$console, $js, $ast] = elements
 
-  $el.html $output
+  # Adds another line to the console output.
+  newConsoleLine = (line) ->
+    $container = $console.find('.console-lines')
+    $line = $('<li>').text(line)
+    $container.append $line
+
+    $line
+
+  updatePlainTextDisplay = ($display, newText) ->
+    $display.find('pre > code').text(newText)
+
+  # Displays an error
+  showError = (text) ->
+    $line = newConsoleLine text
+    $line.addClass 'error'
+
+  # This is the outputter:
+  (result) ->
+    if result.error?
+      showError result.error.toString()
+    else
+      updatePlainTextDisplay $js, result.src
+      updatePlainTextDisplay $ast, JSON.stringify(result.ast, null, 2)
 
 $ ->
   # These are the two elements on the page where stuff happens.
-  $input = $('#pal-program')
-  $ouput = $('#pal-output')
+  $input = $ '#pal-program'
+  $console = $ '#console'
+  $astDisplay = $ '#ast'
+  $jsDisplay = $ '#js'
 
   # These will be fed to the compiler dibblydank.
   inputFetcher = makeInputFetcher $input
-  outputter = makeOutputter $ouput
+  outputter = makeOutputter [$console, $jsDisplay, $astDisplay]
 
   # Debounce the compiler thingy for immediate input, after a while of
   # keyupness. I am making sense.
