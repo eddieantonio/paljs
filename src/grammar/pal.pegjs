@@ -597,7 +597,7 @@ identifier "identifier"
   = !keyword text:id_text __ { return text; }
 
 id_text
-  = $(ALPHA (ALPHA/DIGIT)*)
+  = head:ALPHA tail:(ALPHA/DIGIT)* { return head + tail.join(''); }
 
 
 integer "integer"
@@ -611,22 +611,22 @@ integer "integer"
     }
 
 real "real"
-  = num:$(digits "." DIGIT+) __ {
+  = iPart:digits "." fPart:DIGIT+ __ {
       return {
         ast: 'real',
         loc: [line, column],
 
-        val: parseFloat(num, 10)
+        val: parseFloat(iPart + '.' + fPart, 10)
       }
     }
 
 digits
-  = $(NZDIGIT DIGIT*)
+  = head:NZDIGIT tail:DIGIT* { return head + tail.join(''); }
   / "0"
 
 
 string "string"
-  = "'" text:$(string_char*) "'" __ {
+  = "'" text:(string_char*) "'" __ {
       return {
         ast: 'string',
         loc: [line, column],
@@ -640,7 +640,7 @@ string_char
   / string_escape
 
 normal_string_char
-  = !("'" / EOL / "\\") char:. { return char; }
+  = !("'" / eol / "\\") char:. { return char; }
 
 string_escape
   = "\\" char:escaped_char { return char; }
