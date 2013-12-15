@@ -199,7 +199,7 @@ class JSCodeGenerator
       original = node.val
       # Replace \, ', and \n with their respective backslash escape and add
       # quotes around it. And voila, a JavaScript string literal!
-      "'#{original.replace(/[\\']/, '\\$&').replace(/\n/, '\\n')}'"
+      "'#{original.replace(/[\\']/g, '\\$&').replace(/\n/g, '\\n')}'"
 
     # For integers and reals, do nothing more than explicitly convert these to
     # strings.
