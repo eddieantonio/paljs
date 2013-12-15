@@ -77,7 +77,8 @@ body {
 
 a {text-decoration: none }
 a:link, a:visited { color: #D4DDE4;}
-a:hover, a:active { color: #f0f0f0 }
+a:hover, a:active, a.active { color: #f0f0f0 }
+a.active { border-bottom: 1px #f0f0f0 solid; }
 a:hover { border-bottom: 1px #f0f0f0 dotted }
 
 code, .code {
@@ -207,6 +208,7 @@ code, .code {
 .panel {
     width: 50%;
     height: 100%;
+    position: relative;
 }
 
 .panel.left {
@@ -238,9 +240,49 @@ code, .code {
     resize: none;
 }
 
+/* Output */
+
 .editor textarea:focus {
     border: 0;
     outline: 0;
     opacity: 1;
 }
 
+.output-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 20px;
+    right: 0;
+    margin-bottom: 8px;
+    margin-left: 8px;
+    margin-top: 24px;
+}
+.output-selector {
+    height: 20px;
+    text-align: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.output {
+    display: none;
+    height: 100%;
+    overflow: scroll;
+}
+
+.output.active {
+    display: block;
+
+}
+
+.button-list {
+    display: inline-block;
+    text-align: center;
+}
+.button-list > li {
+    display: inline;
+    padding-right: 8px;
+}

@@ -91,14 +91,40 @@ end.
 
                         <div class='panel right'>
                             <div class='output-wrapper'>
-                                <div class='output active' id='console'></div>
-                                <div class='output' id='js'></div>
+                              <div class='output active' id='console'>
+                                <ol class='code console-lines'>
+                                  <li>Hello, World!</li>
+                                  <li>This is one line.</li>
+                                  <li>This is another.</li>
+                                </ol>
+                              </div>
+                              <div class='output' id='js'><pre><code>(function (input, output) {
+  var $i;
+  var $j;
+  $i = 1;
+  $j = 2;
+  if (($i&gt;$j)) {
+    if ((!$true)) {
+      output((355/113));
+    };
+  } else {
+    if (($false||$true)) {
+      output((~~(42/(7%2))));
+    } else {
+      output((4/5));
+    };
+  };
+  if ($true) {
+    output((38+(67.5*(-(32/3.2)))));
+  };
+}) </code></pre>
+                              </div>
                                 <div class='output' id='ast'></div>
                             </div>
-                            <nav class='output-selector'> <ul>
-                                <li> <a href='#'> Console </a> </li>
-                                <li> <a href='#'> JS </a> </li>
-                                <li> <a href='#'> AST </a> </li>
+                            <nav class='output-selector'> <ul class="button-list">
+                                <li> <a href='#'>Console</a> </li>
+                                <li> <a class="active" href='#'>JS</a> </li>
+                                <li> <a href='#'>AST</a> </li>
                             </ul> </nav>
                         </div>
 
