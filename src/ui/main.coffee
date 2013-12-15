@@ -12,15 +12,6 @@ preventDefault = (fn) -> (event) ->
   event.preventDefault()
   fn.apply @, arguments
 
-# This function based on this answer:
-# http://stackoverflow.com/a/14254253
-isChar = (e) ->
-  modifier =
-    (e.ctrlKey) or (e.altKey) or (e.metaKey)
-  isAlphanumeric =
-    (65 <= e.keyCode <= 90) or (97 <= e.keyCode <= 122)
-  not modifier and isAlphanumeric
-
 # Calls the function and times how long it took to complete.
 timeIt = (fn) ->
   before = performance.now()
@@ -28,6 +19,7 @@ timeIt = (fn) ->
   after = performance.now()
 
   after - before
+
 
 # Given an element that contains a "button list", turns all links with
 # 'data-panel' attribute into button things enabling the given id.
@@ -80,8 +72,12 @@ makeOutputter = (elements, $eventSource) ->
   # Adds another line to the console output.
   newConsoleLine = (line, cls='') ->
     $container = $console.find('.console-lines')
+
     $line = $('<li>').text(line)
     $container.append $line
+
+    # Scroll to the bottom of the container.
+    $container.parent().scrollTop($container.height())
 
     $line
 
@@ -159,11 +155,8 @@ $ ->
   makeButtonBar $('.output-selector'), $('.output-wrapper')
   
   # Compile the input on change.
-  $input.on 'copy cut paste change', ->
+  $input.on 'input copy cut paste change', ->
     delayedCompile()
-  $input.on 'keypress', (event) ->
-    if isChar event
-      $input.trigger 'change'
 
   # Tell people to run the code when the 'run event source' is clicked
   $runEventSource.on 'click', preventDefault (event) ->
